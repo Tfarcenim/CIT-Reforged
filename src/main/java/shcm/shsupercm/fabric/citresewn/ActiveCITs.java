@@ -1,16 +1,5 @@
 package shcm.shsupercm.fabric.citresewn;
 
-import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
 import shcm.shsupercm.fabric.citresewn.pack.CITPack;
 import shcm.shsupercm.fabric.citresewn.pack.cits.*;
@@ -18,6 +7,17 @@ import shcm.shsupercm.fabric.citresewn.pack.cits.*;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 
 public class ActiveCITs {
     public final List<CITPack> packs;
@@ -51,7 +51,7 @@ public class ActiveCITs {
                     if (type instanceof ArmorItem armorType)
                         citArmor.computeIfAbsent(armorType, t -> new ArrayList<>()).add(armor);
                     else
-                        CITResewn.logErrorLoading("Ignoring item type: " + Registry.ITEM.getId(type) + " is not armor in " + cit.pack.resourcePack.getName() + " -> " + cit.propertiesIdentifier.toString());
+                        CITResewn.logErrorLoading("Ignoring item type: " + Registry.ITEM.getKey(type) + " is not armor in " + cit.pack.resourcePack.getName() + " -> " + cit.propertiesIdentifier.toString());
             else if (cit instanceof CITElytra elytra)
                 citElytra.add(elytra);
             else if (cit instanceof CITEnchantment enchantment)
@@ -75,8 +75,8 @@ public class ActiveCITs {
         citEnchantments.clear();
     }
 
-    public CITItem getCITItem(ItemStack stack, World world, LivingEntity entity) {
-        Hand hand = entity != null && stack == entity.getOffHandStack() ? Hand.OFF_HAND : Hand.MAIN_HAND;
+    public CITItem getCITItem(ItemStack stack, Level world, LivingEntity entity) {
+        InteractionHand hand = entity != null && stack == entity.getOffhandItem() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
 
         ((CITItem.Cached) (Object) stack).citresewn_setMojankCIT(false);
 
@@ -84,21 +84,21 @@ public class ActiveCITs {
         if (citItems != null)
             for (CITItem citItem : citItems)
                 if (citItem.test(stack, hand, world, entity, true)) {
-                    if (stack.isOf(Items.TRIDENT) || stack.isOf(Items.SPYGLASS))
+                    if (stack.is(Items.TRIDENT) || stack.is(Items.SPYGLASS))
                         ((CITItem.Cached) (Object) stack).citresewn_setMojankCIT(true);
                     return citItem;
                 }
         return null;
     }
 
-    public CITElytra getCITElytra(ItemStack stack, World world, LivingEntity livingEntity) {
+    public CITElytra getCITElytra(ItemStack stack, Level world, LivingEntity livingEntity) {
         for (CITElytra citElytra : citElytra)
-            if (citElytra.test(stack, Hand.MAIN_HAND, world, livingEntity, true))
+            if (citElytra.test(stack, InteractionHand.MAIN_HAND, world, livingEntity, true))
                 return citElytra;
         return null;
     }
 
-    public CITArmor getCITArmor(ItemStack stack, World world, LivingEntity livingEntity) {
+    public CITArmor getCITArmor(ItemStack stack, Level world, LivingEntity livingEntity) {
         Item item = stack.getItem();
         if (item instanceof ArmorItem) {
             List<CITArmor> citArmor = this.citArmor.get(item);
@@ -110,8 +110,8 @@ public class ActiveCITs {
         return null;
     }
 
-    public List<CITEnchantment> getCITEnchantment(ItemStack stack, World world, LivingEntity livingEntity) {
-        Hand hand = livingEntity != null && stack == livingEntity.getOffHandStack() ? Hand.OFF_HAND : Hand.MAIN_HAND;
+    public List<CITEnchantment> getCITEnchantment(ItemStack stack, Level world, LivingEntity livingEntity) {
+        InteractionHand hand = livingEntity != null && stack == livingEntity.getOffhandItem() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
 
         List<CITEnchantment> applied = new ArrayList<>();
 
@@ -125,7 +125,7 @@ public class ActiveCITs {
         return applied;
     }
 
-    public BakedModel getItemModelCached(ItemStack stack, World world, LivingEntity entity, int seed) {
+    public BakedModel getItemModelCached(ItemStack stack, Level world, LivingEntity entity, int seed) {
         BakedModel bakedModel = null;
 
         Supplier<CITItem> realtime = () -> getCITItem(stack, world, entity);
@@ -134,12 +134,12 @@ public class ActiveCITs {
         CITItem citItem = CITResewnConfig.INSTANCE().cache_ms == 0 ? realtime.get() : ((CITItem.Cached) (Object) stack).citresewn_getCachedCITItem(realtime);
 
         if (citItem != null)
-            bakedModel = citItem.getItemModel(stack, (ClientWorld) world, entity, seed);
+            bakedModel = citItem.getItemModel(stack, (ClientLevel) world, entity, seed);
 
         return bakedModel;
     }
 
-    public Identifier getElytraTextureCached(ItemStack stack, World world, LivingEntity livingEntity) {
+    public ResourceLocation getElytraTextureCached(ItemStack stack, Level world, LivingEntity livingEntity) {
         Supplier<CITElytra> realtime = () -> getCITElytra(stack, world, livingEntity);
 
         //noinspection ConstantConditions
@@ -151,7 +151,7 @@ public class ActiveCITs {
         return null;
     }
 
-    public Map<String, Identifier> getArmorTexturesCached(ItemStack stack, World world, LivingEntity livingEntity) {
+    public Map<String, ResourceLocation> getArmorTexturesCached(ItemStack stack, Level world, LivingEntity livingEntity) {
         Supplier<CITArmor> realtime = () -> getCITArmor(stack, world, livingEntity);
 
         //noinspection ConstantConditions
@@ -163,7 +163,7 @@ public class ActiveCITs {
         return null;
     }
 
-    public void setEnchantmentAppliedContextCached(ItemStack stack, World world, LivingEntity entity) {
+    public void setEnchantmentAppliedContextCached(ItemStack stack, Level world, LivingEntity entity) {
         if (stack == null) {
             CITEnchantment.appliedContext = null;
             return;

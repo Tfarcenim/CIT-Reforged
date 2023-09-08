@@ -1,19 +1,27 @@
 package shcm.shsupercm.fabric.citresewn.pack.cits;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexMultiConsumer;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.*;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import org.lwjgl.opengl.GL11;
 import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
 import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
@@ -33,7 +41,7 @@ public class CITEnchantment extends CIT {
     public static List<CITEnchantment> appliedContext = null;
     public static boolean shouldApply = false;
 
-    public final Identifier textureIdentifier;
+    public final ResourceLocation textureIdentifier;
     public final float speed, rotation, duration, r, g, b, a;
     public final int layer;
     public final boolean useGlint, blur;
@@ -41,12 +49,12 @@ public class CITEnchantment extends CIT {
 
     private final WrappedMethodIntensity methodIntensity = new WrappedMethodIntensity();
 
-    public final Map<GlintRenderLayer, RenderLayer> renderLayers = new EnumMap<>(GlintRenderLayer.class);
+    public final Map<GlintRenderLayer, RenderType> renderLayers = new EnumMap<>(GlintRenderLayer.class);
 
-    public CITEnchantment(CITPack pack, Identifier identifier, Properties properties) throws CITParseException {
+    public CITEnchantment(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException {
         super(pack, identifier, properties);
         try {
-            textureIdentifier = resolvePath(identifier, properties.getProperty("texture"), ".png", id -> pack.resourcePack.contains(ResourceType.CLIENT_RESOURCES, id));
+            textureIdentifier = resolvePath(identifier, properties.getProperty("texture"), ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
             if (textureIdentifier == null)
                 throw new Exception("Cannot resolve texture");
 
@@ -83,84 +91,84 @@ public class CITEnchantment extends CIT {
 
     public void activate() {
         for (GlintRenderLayer glintLayer : GlintRenderLayer.values()) {
-            RenderLayer renderLayer = glintLayer.build(this);
+            RenderType renderLayer = glintLayer.build(this);
 
             renderLayers.put(glintLayer, renderLayer);
-            ((BufferBuilderStorageAccessor) MinecraftClient.getInstance().getBufferBuilders()).entityBuilders().put(renderLayer, new BufferBuilder(renderLayer.getExpectedBufferSize()));
+            ((BufferBuilderStorageAccessor) Minecraft.getInstance().renderBuffers()).entityBuilders().put(renderLayer, new BufferBuilder(renderLayer.bufferSize()));
         }
     }
 
     @Override
     public void dispose() {
         appliedContext = null;
-        for (RenderLayer renderLayer : renderLayers.values())
-            ((BufferBuilderStorageAccessor) MinecraftClient.getInstance().getBufferBuilders()).entityBuilders().remove(renderLayer);
+        for (RenderType renderLayer : renderLayers.values())
+            ((BufferBuilderStorageAccessor) Minecraft.getInstance().renderBuffers()).entityBuilders().remove(renderLayer);
     }
 
     public enum GlintRenderLayer {
         ARMOR_GLINT("armor_glint", 8f, layer -> layer
-                .shader(RenderPhaseAccessor.ARMOR_GLINT_SHADER())
-                .writeMaskState(RenderPhaseAccessor.COLOR_MASK())
-                .cull(RenderPhaseAccessor.DISABLE_CULLING())
-                .depthTest(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
-                .layering(RenderPhaseAccessor.VIEW_OFFSET_Z_LAYERING())),
+                .setShaderState(RenderPhaseAccessor.ARMOR_GLINT_SHADER())
+                .setWriteMaskState(RenderPhaseAccessor.COLOR_MASK())
+                .setCullState(RenderPhaseAccessor.DISABLE_CULLING())
+                .setDepthTestState(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
+                .setLayeringState(RenderPhaseAccessor.VIEW_OFFSET_Z_LAYERING())),
         ARMOR_ENTITY_GLINT("armor_entity_glint", 0.16f, layer -> layer
-                .shader(RenderPhaseAccessor.ARMOR_ENTITY_GLINT_SHADER())
-                .writeMaskState(RenderPhaseAccessor.COLOR_MASK())
-                .cull(RenderPhaseAccessor.DISABLE_CULLING())
-                .depthTest(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
-                .layering(RenderPhaseAccessor.VIEW_OFFSET_Z_LAYERING())),
+                .setShaderState(RenderPhaseAccessor.ARMOR_ENTITY_GLINT_SHADER())
+                .setWriteMaskState(RenderPhaseAccessor.COLOR_MASK())
+                .setCullState(RenderPhaseAccessor.DISABLE_CULLING())
+                .setDepthTestState(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
+                .setLayeringState(RenderPhaseAccessor.VIEW_OFFSET_Z_LAYERING())),
         GLINT_TRANSLUCENT("glint_translucent", 8f, layer -> layer
-                .shader(RenderPhaseAccessor.TRANSLUCENT_GLINT_SHADER())
-                .writeMaskState(RenderPhaseAccessor.COLOR_MASK())
-                .cull(RenderPhaseAccessor.DISABLE_CULLING())
-                .depthTest(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
-                .target(RenderPhaseAccessor.ITEM_TARGET())),
+                .setShaderState(RenderPhaseAccessor.TRANSLUCENT_GLINT_SHADER())
+                .setWriteMaskState(RenderPhaseAccessor.COLOR_MASK())
+                .setCullState(RenderPhaseAccessor.DISABLE_CULLING())
+                .setDepthTestState(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
+                .setOutputState(RenderPhaseAccessor.ITEM_TARGET())),
         GLINT("glint", 8f, layer -> layer
-                .shader(RenderPhaseAccessor.GLINT_SHADER())
-                .writeMaskState(RenderPhaseAccessor.COLOR_MASK())
-                .cull(RenderPhaseAccessor.DISABLE_CULLING())
-                .depthTest(RenderPhaseAccessor.EQUAL_DEPTH_TEST())),
+                .setShaderState(RenderPhaseAccessor.GLINT_SHADER())
+                .setWriteMaskState(RenderPhaseAccessor.COLOR_MASK())
+                .setCullState(RenderPhaseAccessor.DISABLE_CULLING())
+                .setDepthTestState(RenderPhaseAccessor.EQUAL_DEPTH_TEST())),
         DIRECT_GLINT("glint_direct", 8f, layer -> layer
-                .shader(RenderPhaseAccessor.DIRECT_GLINT_SHADER())
-                .writeMaskState(RenderPhaseAccessor.COLOR_MASK())
-                .cull(RenderPhaseAccessor.DISABLE_CULLING())
-                .depthTest(RenderPhaseAccessor.EQUAL_DEPTH_TEST())),
+                .setShaderState(RenderPhaseAccessor.DIRECT_GLINT_SHADER())
+                .setWriteMaskState(RenderPhaseAccessor.COLOR_MASK())
+                .setCullState(RenderPhaseAccessor.DISABLE_CULLING())
+                .setDepthTestState(RenderPhaseAccessor.EQUAL_DEPTH_TEST())),
         ENTITY_GLINT("entity_glint", 0.16f, layer -> layer
-                .shader(RenderPhaseAccessor.ENTITY_GLINT_SHADER())
-                .writeMaskState(RenderPhaseAccessor.COLOR_MASK())
-                .cull(RenderPhaseAccessor.DISABLE_CULLING())
-                .depthTest(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
-                .target(RenderPhaseAccessor.ITEM_TARGET())),
+                .setShaderState(RenderPhaseAccessor.ENTITY_GLINT_SHADER())
+                .setWriteMaskState(RenderPhaseAccessor.COLOR_MASK())
+                .setCullState(RenderPhaseAccessor.DISABLE_CULLING())
+                .setDepthTestState(RenderPhaseAccessor.EQUAL_DEPTH_TEST())
+                .setOutputState(RenderPhaseAccessor.ITEM_TARGET())),
         DIRECT_ENTITY_GLINT("entity_glint_direct", 0.16f, layer -> layer
-                .shader(RenderPhaseAccessor.DIRECT_ENTITY_GLINT_SHADER())
-                .writeMaskState(RenderPhaseAccessor.COLOR_MASK())
-                .cull(RenderPhaseAccessor.DISABLE_CULLING())
-                .depthTest(RenderPhaseAccessor.EQUAL_DEPTH_TEST()));
+                .setShaderState(RenderPhaseAccessor.DIRECT_ENTITY_GLINT_SHADER())
+                .setWriteMaskState(RenderPhaseAccessor.COLOR_MASK())
+                .setCullState(RenderPhaseAccessor.DISABLE_CULLING())
+                .setDepthTestState(RenderPhaseAccessor.EQUAL_DEPTH_TEST()));
 
         public final String name;
-        private final Consumer<RenderLayer.MultiPhaseParameters.Builder> setup;
+        private final Consumer<RenderType.CompositeState.CompositeStateBuilder> setup;
         private final float scale;
 
-        GlintRenderLayer(String name, float scale, Consumer<RenderLayer.MultiPhaseParameters.Builder> setup) {
+        GlintRenderLayer(String name, float scale, Consumer<RenderType.CompositeState.CompositeStateBuilder> setup) {
             this.name = name;
             this.scale = scale;
             this.setup = setup;
         }
 
-        public RenderLayer build(CITEnchantment enchantment) {
+        public RenderType build(CITEnchantment enchantment) {
             final float speed = enchantment.speed, rotation = enchantment.rotation, r = enchantment.r, g = enchantment.g, b = enchantment.b, a = enchantment.a;
             final WrappedMethodIntensity methodIntensity = enchantment.methodIntensity;
             //noinspection ConstantConditions
-            RenderLayer.MultiPhaseParameters.Builder layer = RenderLayer.MultiPhaseParameters.builder()
-                    .texture(new RenderPhase.Texture(enchantment.textureIdentifier, enchantment.blur, false))
-                    .texturing(new RenderPhase.Texturing("citresewn_glint_texturing", () -> {
-                        float l = Util.getMeasuringTimeMs() * CITResewnConfig.INSTANCE().citenchantment_scroll_multiplier * speed;
+            RenderType.CompositeState.CompositeStateBuilder layer = RenderType.CompositeState.builder()
+                    .setTextureState(new RenderStateShard.TextureStateShard(enchantment.textureIdentifier, enchantment.blur, false))
+                    .setTexturingState(new RenderStateShard.TexturingStateShard("citresewn_glint_texturing", () -> {
+                        float l = Util.getMillis() * CITResewnConfig.INSTANCE().citenchantment_scroll_multiplier * speed;
                         float x = (l % 110000f) / 110000f;
                         float y = (l % 30000f) / 30000f;
-                        Matrix4f matrix4f = Matrix4f.translate(-x, y, 0.0f);
-                        matrix4f.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(rotation + 10f));
-                        matrix4f.multiply(Matrix4f.scale(scale, scale, scale));
+                        Matrix4f matrix4f = Matrix4f.createTranslateMatrix(-x, y, 0.0f);
+                        matrix4f.multiply(Vector3f.ZP.rotationDegrees(rotation + 10f));
+                        matrix4f.multiply(Matrix4f.createScaleMatrix(scale, scale, scale));
                         setTextureMatrix(matrix4f);
 
                         setShaderColor(r, g, b, a * methodIntensity.intensity);
@@ -169,18 +177,18 @@ public class CITEnchantment extends CIT {
 
                         setShaderColor(1f, 1f, 1f, 1f);
                     }))
-                    .transparency(enchantment.blend);
+                    .setTransparencyState(enchantment.blend);
 
             this.setup.accept(layer);
 
-            return RenderLayer.of("citresewn:enchantment_" + this.name + ":" + enchantment.propertiesIdentifier.toString(),
-                    VertexFormats.POSITION_TEXTURE,
-                    VertexFormat.DrawMode.QUADS,
+            return RenderType.create("citresewn:enchantment_" + this.name + ":" + enchantment.propertiesIdentifier.toString(),
+                    DefaultVertexFormat.POSITION_TEX,
+                    VertexFormat.Mode.QUADS,
                     256,
-                    layer.build(false));
+                    layer.createCompositeState(false));
         }
 
-        public VertexConsumer tryApply(VertexConsumer base, RenderLayer baseLayer, VertexConsumerProvider provider) {
+        public VertexConsumer tryApply(VertexConsumer base, RenderType baseLayer, MultiBufferSource provider) {
             if (!shouldApply || appliedContext == null || appliedContext.size() == 0)
                 return null;
 
@@ -191,11 +199,11 @@ public class CITEnchantment extends CIT {
 
             provider.getBuffer(baseLayer); // refresh base layer for armor consumer
 
-            return base == null ? VertexConsumers.union(layers) : VertexConsumers.union(VertexConsumers.union(layers), base);
+            return base == null ? VertexMultiConsumer.create(layers) : VertexMultiConsumer.create(VertexMultiConsumer.create(layers), base);
         }
     }
 
-    public static class Blend extends RenderPhase.Transparency {
+    public static class Blend extends RenderStateShard.TransparencyStateShard {
         private final int src, dst, srcAlpha, dstAlpha;
 
         private Blend(String name, int src, int dst, int srcAlpha, int dstAlpha) {
@@ -211,13 +219,13 @@ public class CITEnchantment extends CIT {
         }
 
         @Override
-        public void startDrawing() {
+        public void setupRenderState() {
             enableBlend();
             blendFuncSeparate(src, dst, srcAlpha, dstAlpha);
         }
 
         @Override
-        public void endDrawing() {
+        public void clearRenderState() {
             defaultBlendFunc();
             disableBlend();
         }
@@ -252,7 +260,7 @@ public class CITEnchantment extends CIT {
         private enum Named {
             REPLACE(new Blend("replace", 0, 0) {
                 @Override
-                public void startDrawing() {
+                public void setupRenderState() {
                     disableBlend();
                 }
             }),
@@ -291,9 +299,9 @@ public class CITEnchantment extends CIT {
     public enum MergeMethod {
         AVERAGE {
             @Override
-            public void applyIntensity(Map<Identifier, Integer> stackEnchantments, CITEnchantment cit) {
-                Identifier enchantment = null;
-                for (Identifier enchantmentMatch : cit.enchantments)
+            public void applyIntensity(Map<ResourceLocation, Integer> stackEnchantments, CITEnchantment cit) {
+                ResourceLocation enchantment = null;
+                for (ResourceLocation enchantmentMatch : cit.enchantments)
                     if (stackEnchantments.containsKey(enchantmentMatch)) {
                         enchantment = enchantmentMatch;
                         break;
@@ -312,9 +320,9 @@ public class CITEnchantment extends CIT {
         },
         LAYERED {
             @Override
-            public void applyIntensity(Map<Identifier, Integer> stackEnchantments, CITEnchantment cit) {
-                Identifier enchantment = null;
-                for (Identifier enchantmentMatch : cit.enchantments)
+            public void applyIntensity(Map<ResourceLocation, Integer> stackEnchantments, CITEnchantment cit) {
+                ResourceLocation enchantment = null;
+                for (ResourceLocation enchantmentMatch : cit.enchantments)
                     if (stackEnchantments.containsKey(enchantmentMatch)) {
                         enchantment = enchantmentMatch;
                         break;
@@ -346,14 +354,14 @@ public class CITEnchantment extends CIT {
 
         public static int ticks = 0;
 
-        public void applyIntensity(Map<Identifier, Integer> stackEnchantments, CITEnchantment cit) {
+        public void applyIntensity(Map<ResourceLocation, Integer> stackEnchantments, CITEnchantment cit) {
             cit.methodIntensity.intensity = 1f;
         }
 
         public void applyMethod(List<CITEnchantment> citEnchantments, ItemStack stack) {
-            Map<Identifier, Integer> stackEnchantments = new LinkedHashMap<>();
-            for (NbtElement nbtElement : stack.isOf(Items.ENCHANTED_BOOK) ? EnchantedBookItem.getEnchantmentNbt(stack) : stack.getEnchantments())
-                stackEnchantments.put(EnchantmentHelper.getIdFromNbt((NbtCompound) nbtElement), EnchantmentHelper.getLevelFromNbt((NbtCompound) nbtElement));
+            Map<ResourceLocation, Integer> stackEnchantments = new LinkedHashMap<>();
+            for (Tag nbtElement : stack.is(Items.ENCHANTED_BOOK) ? EnchantedBookItem.getEnchantments(stack) : stack.getEnchantmentTags())
+                stackEnchantments.put(EnchantmentHelper.getEnchantmentId((CompoundTag) nbtElement), EnchantmentHelper.getEnchantmentLevel((CompoundTag) nbtElement));
 
             for (CITEnchantment cit : citEnchantments)
                 if (!cit.enchantmentsAny)

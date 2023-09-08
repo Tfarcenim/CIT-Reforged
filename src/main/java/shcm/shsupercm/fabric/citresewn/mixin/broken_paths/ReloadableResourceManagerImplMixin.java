@@ -1,9 +1,9 @@
 package shcm.shsupercm.fabric.citresewn.mixin.broken_paths;
 
-import net.minecraft.resource.ReloadableResourceManagerImpl;
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceReload;
-import net.minecraft.resource.ResourceType;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ReloadInstance;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.util.Unit;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,15 +17,15 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-/* if (CITResewnConfig.read().broken_paths) */ @Mixin(ReloadableResourceManagerImpl.class)
+/* if (CITResewnConfig.read().broken_paths) */ @Mixin(ReloadableResourceManager.class)
 public class ReloadableResourceManagerImplMixin {
-    @Shadow @Final private ResourceType type;
+    @Shadow @Final private PackType type;
 
     @Inject(method = "reload", at = @At("RETURN"))
-    public void onReload(Executor prepareExecutor, Executor applyExecutor, CompletableFuture<Unit> initialStage, List<ResourcePack> packs, CallbackInfoReturnable<ResourceReload> cir) {
-        if (CITResewn.INSTANCE.processingBrokenPaths = this.type == ResourceType.CLIENT_RESOURCES) {
+    public void onReload(Executor prepareExecutor, Executor applyExecutor, CompletableFuture<Unit> initialStage, List<PackResources> packs, CallbackInfoReturnable<ReloadInstance> cir) {
+        if (CITResewn.INSTANCE.processingBrokenPaths = this.type == PackType.CLIENT_RESOURCES) {
             CITResewn.LOG.error("[citresewn] Caution! Broken paths is enabled!");
-            cir.getReturnValue().whenComplete().thenRun(() -> CITResewn.INSTANCE.processingBrokenPaths = false);
+            cir.getReturnValue().done().thenRun(() -> CITResewn.INSTANCE.processingBrokenPaths = false);
         }
     }
 }

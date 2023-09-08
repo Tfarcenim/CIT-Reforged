@@ -1,8 +1,5 @@
 package shcm.shsupercm.fabric.citresewn.mixin.core;
 
-import net.minecraft.client.render.model.ModelLoader;
-import net.minecraft.client.util.ModelIdentifier;
-import net.minecraft.resource.ResourceManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,15 +16,18 @@ import shcm.shsupercm.fabric.citresewn.pack.cits.CIT;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 
 import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
 
-@Mixin(value = ModelLoader.class, priority = 999)
+@Mixin(value = ModelBakery.class, priority = 999)
 public abstract class ModelLoaderMixin {
     @Shadow @Final private ResourceManager resourceManager;
 
     @Inject(method = "addModel", at = @At("TAIL"))
-    public void initCITs(ModelIdentifier eventModelId, CallbackInfo ci) { if (eventModelId != ModelLoader.MISSING_ID) return;
+    public void initCITs(ModelResourceLocation eventModelId, CallbackInfo ci) { if (eventModelId != ModelBakery.MISSING_MODEL_LOCATION) return;
         if (CITResewn.INSTANCE.activeCITs != null) {
             info("Clearing active CITs..");
             CITResewn.INSTANCE.activeCITs.dispose();
@@ -38,7 +38,7 @@ public abstract class ModelLoaderMixin {
             return;
 
         info("Parsing CITs...");
-        List<CITPack> parsedPacks = CITParser.parseCITs(resourceManager.streamResourcePacks().collect(Collectors.toCollection(ArrayList::new)));
+        List<CITPack> parsedPacks = CITParser.parseCITs(resourceManager.listPacks().collect(Collectors.toCollection(ArrayList::new)));
         List<CIT> parsed = parsedPacks.stream().flatMap(pack -> pack.cits.stream()).collect(Collectors.toCollection(ArrayList::new));
 
         if (parsed.size() > 0) {

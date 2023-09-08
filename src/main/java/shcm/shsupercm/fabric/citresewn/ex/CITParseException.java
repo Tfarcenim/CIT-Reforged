@@ -1,13 +1,13 @@
 package shcm.shsupercm.fabric.citresewn.ex;
 
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
 
 /**
  * Thrown when a cit failed to be parsed
  */
 public class CITParseException extends Exception {
-    public CITParseException(ResourcePack resourcePack, Identifier identifier, String message) {
+    public CITParseException(PackResources resourcePack, ResourceLocation identifier, String message) {
         super("Skipped CIT: " + message + " in " + resourcePack.getName() + " -> " + identifier.toString());
     }
 }

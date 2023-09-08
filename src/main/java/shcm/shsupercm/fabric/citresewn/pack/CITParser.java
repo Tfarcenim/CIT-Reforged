@@ -1,8 +1,5 @@
 package shcm.shsupercm.fabric.citresewn.pack;
 
-import net.minecraft.resource.ResourcePack;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.StringUtils;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
 import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
@@ -14,6 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
 
 /**
  * Parses cits from resourcepacks
@@ -35,7 +35,7 @@ public final class CITParser { private CITParser() {}
      * @param packs packs to parse
      * @return a collection of parsed CITs
      */
-    public static List<CITPack> parseCITs(Collection<ResourcePack> packs) {
+    public static List<CITPack> parseCITs(Collection<PackResources> packs) {
         return packs.stream()
                 .map(CITParser::parse)
                 .flatMap(Collection::stream)
@@ -47,27 +47,27 @@ public final class CITParser { private CITParser() {}
      * @param resourcePack pack to parse
      * @return a collection of CITPacks or an empty collection if resourcepack contains none
      */
-    public static Collection<CITPack> parse(ResourcePack resourcePack) {
+    public static Collection<CITPack> parse(PackResources resourcePack) {
         final CITPack citPack = new CITPack(resourcePack);
 
-        Collection<Identifier> packProperties = new ArrayList<>();
-        for (String namespace : resourcePack.getNamespaces(ResourceType.CLIENT_RESOURCES))
-            if (Identifier.isValid(namespace))
+        Collection<ResourceLocation> packProperties = new ArrayList<>();
+        for (String namespace : resourcePack.getNamespaces(PackType.CLIENT_RESOURCES))
+            if (ResourceLocation.isValidResourceLocation(namespace))
                 for (String citRoot : new String[] { "citresewn", "optifine", "mcpatcher" }) {
-                    packProperties.addAll(resourcePack.findResources(ResourceType.CLIENT_RESOURCES, namespace, citRoot + "/cit", s -> s.getPath().endsWith(".properties")));
-                    Identifier global = new Identifier(namespace, citRoot + "/cit.properties");
-                    if (resourcePack.contains(ResourceType.CLIENT_RESOURCES, global))
+                    packProperties.addAll(resourcePack.getResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", s -> s.getPath().endsWith(".properties")));
+                    ResourceLocation global = new ResourceLocation(namespace, citRoot + "/cit.properties");
+                    if (resourcePack.hasResource(PackType.CLIENT_RESOURCES, global))
                         packProperties.add(global);
                 }
 
         boolean readGlobalProperties = false;
-        for (Iterator<Identifier> iterator = packProperties.iterator(); iterator.hasNext(); ) {
-            Identifier propertiesIdentifier = iterator.next();
+        for (Iterator<ResourceLocation> iterator = packProperties.iterator(); iterator.hasNext(); ) {
+            ResourceLocation propertiesIdentifier = iterator.next();
             try {
                 if (StringUtils.countMatches(propertiesIdentifier.getPath(), '/') <= 2 && propertiesIdentifier.getPath().endsWith("cit.properties")) {
                     iterator.remove();
                     if (!readGlobalProperties)
-                        try (InputStream is = resourcePack.open(ResourceType.CLIENT_RESOURCES, propertiesIdentifier)) {
+                        try (InputStream is = resourcePack.getResource(PackType.CLIENT_RESOURCES, propertiesIdentifier)) {
                             Properties citProperties = new Properties();
                             citProperties.load(is);
                             citPack.loadGlobalProperties(citProperties);
@@ -81,7 +81,7 @@ public final class CITParser { private CITParser() {}
 
         packProperties.stream()
                 .flatMap(citIdentifier -> {
-                    try (InputStream is = resourcePack.open(ResourceType.CLIENT_RESOURCES, citIdentifier)) {
+                    try (InputStream is = resourcePack.getResource(PackType.CLIENT_RESOURCES, citIdentifier)) {
                         Properties citProperties = new Properties();
                         citProperties.load(new InputStreamReader(is, StandardCharsets.UTF_8));
 
@@ -106,6 +106,6 @@ public final class CITParser { private CITParser() {}
     }
 
     public interface CITConstructor {
-        CIT cit(CITPack pack, Identifier identifier, Properties properties) throws CITParseException;
+        CIT cit(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException;
     }
 }

@@ -1,31 +1,31 @@
 package shcm.shsupercm.fabric.citresewn.pack.cits;
 
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.Item;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
 import shcm.shsupercm.fabric.citresewn.pack.CITPack;
 
 import java.util.*;
 import java.util.function.Supplier;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 
 public class CITArmor extends CIT {
-    public final Map<String, Identifier> textures = new HashMap<>();
+    public final Map<String, ResourceLocation> textures = new HashMap<>();
 
-    public CITArmor(CITPack pack, Identifier identifier, Properties properties) throws CITParseException {
+    public CITArmor(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException {
         super(pack, identifier, properties);
         try {
             if (this.items.size() == 0)
                 throw new Exception("CIT must target at least one item type");
             for (Item item : this.items)
                 if (!(item instanceof ArmorItem))
-                    throw new Exception("Armor CIT must target armor items only(" + Registry.ITEM.getId(item) + " is not armor)");
+                    throw new Exception("Armor CIT must target armor items only(" + Registry.ITEM.getKey(item) + " is not armor)");
 
             for (Object o : properties.keySet())
                 if (o instanceof String property && property.startsWith("texture.")) {
-                    Identifier textureIdentifier = resolvePath(identifier, properties.getProperty(property), ".png", id -> pack.resourcePack.contains(ResourceType.CLIENT_RESOURCES, id));
+                    ResourceLocation textureIdentifier = resolvePath(identifier, properties.getProperty(property), ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
                     if (textureIdentifier == null)
                         throw new Exception("Cannot resolve path for " + property);
 

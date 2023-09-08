@@ -1,18 +1,18 @@
 package shcm.shsupercm.fabric.citresewn.pack.cits;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.*;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Tuple;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Level;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
 import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
 import shcm.shsupercm.fabric.citresewn.mixin.core.NbtCompoundAccessor;
@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 
 public abstract class CIT {
     public final CITPack pack;
-    public final Identifier propertiesIdentifier;
+    public final ResourceLocation propertiesIdentifier;
 
     public final Set<Item> items = new HashSet<>();
 
@@ -35,24 +35,24 @@ public abstract class CIT {
     public final int stackMin, stackMax;
     public final boolean stackAny, stackRange;
 
-    public final Set<Identifier> enchantments = new HashSet<>();
-    public final List<Pair<Integer, Integer>> enchantmentLevels = new ArrayList<>();
+    public final Set<ResourceLocation> enchantments = new HashSet<>();
+    public final List<Tuple<Integer, Integer>> enchantmentLevels = new ArrayList<>();
     public final boolean enchantmentsAny, enchantmentLevelsAny;
 
-    public final Hand hand;
+    public final InteractionHand hand;
 
-    public final Predicate<NbtCompound> nbt;
+    public final Predicate<CompoundTag> nbt;
 
     public final int weight;
 
-    public CIT(CITPack pack, Identifier identifier, Properties properties) throws CITParseException {
+    public CIT(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException {
         this.pack = pack;
         this.propertiesIdentifier = identifier;
         try {
             for (String itemId : (properties.getProperty("items", properties.getProperty("matchItems", " "))).split(" "))
                 if (!itemId.isEmpty()) {
-                    Identifier itemIdentifier = new Identifier(itemId);
-                    if (!Registry.ITEM.containsId(itemIdentifier))
+                    ResourceLocation itemIdentifier = new ResourceLocation(itemId);
+                    if (!Registry.ITEM.containsKey(itemIdentifier))
                         throw new Exception("Unknown item " + itemId);
                     this.items.add(Registry.ITEM.get(itemIdentifier));
                 }
@@ -61,8 +61,8 @@ public abstract class CIT {
                     String id = propertiesIdentifier.getPath().substring(0, propertiesIdentifier.getPath().length() - 11);
                     String[] split = id.split("/");
                     id = split[split.length - 1];
-                    Identifier itemId = new Identifier(propertiesIdentifier.getNamespace(), id);
-                    if (Registry.ITEM.containsId(itemId))
+                    ResourceLocation itemId = new ResourceLocation(propertiesIdentifier.getNamespace(), id);
+                    if (Registry.ITEM.containsKey(itemId))
                         this.items.add(Registry.ITEM.get(itemId));
                 } catch (Exception ignored) { }
 
@@ -123,8 +123,8 @@ public abstract class CIT {
             String enchantmentIDs = properties.getProperty("enchantments", properties.getProperty("enchantmentIDs"));
             if (!(this.enchantmentsAny = enchantmentIDs == null)) {
                 for (String ench : enchantmentIDs.split(" ")) {
-                    Identifier enchIdentifier = new Identifier(ench);
-                    if (!Registry.ENCHANTMENT.containsId(enchIdentifier))
+                    ResourceLocation enchIdentifier = new ResourceLocation(ench);
+                    if (!Registry.ENCHANTMENT.containsKey(enchIdentifier))
                         CITResewn.logWarnLoading("CIT Warning: Unknown enchantment " + enchIdentifier);
                     this.enchantments.add(enchIdentifier);
                 }
@@ -138,24 +138,24 @@ public abstract class CIT {
                             range = range.substring(1);
                             if (range.contains("-"))
                                 throw new Exception("enchantmentLevels ranges must have up to 2 numbers each");
-                            this.enchantmentLevels.add(new Pair<>(0, Integer.parseInt(range)));
+                            this.enchantmentLevels.add(new Tuple<>(0, Integer.parseInt(range)));
                         } else if (range.endsWith("-")) {
                             range = range.substring(0, range.length() - 1);
                             if (range.contains("-"))
                                 throw new Exception("enchantmentLevels ranges must have up to 2 numbers each");
-                            this.enchantmentLevels.add(new Pair<>(Integer.parseInt(range), Integer.MAX_VALUE));
+                            this.enchantmentLevels.add(new Tuple<>(Integer.parseInt(range), Integer.MAX_VALUE));
                         } else {
                             String[] split = range.split("-");
                             if (split.length != 2)
                                 throw new Exception("enchantmentLevels ranges must have up to 2 numbers each");
-                            Pair<Integer, Integer> minMaxPair = new Pair<>(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
-                            if (minMaxPair.getLeft() > minMaxPair.getRight())
+                            Tuple<Integer, Integer> minMaxPair = new Tuple<>(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+                            if (minMaxPair.getA() > minMaxPair.getB())
                                 throw new Exception("enchantmentLevels range min is higher than max");
                             this.enchantmentLevels.add(minMaxPair);
                         }
                     } else {
                         int level = Integer.parseInt(range);
-                        this.enchantmentLevels.add(new Pair<>(level, level));
+                        this.enchantmentLevels.add(new Tuple<>(level, level));
                     }
                 }
             }
@@ -166,7 +166,7 @@ public abstract class CIT {
                 default -> null;
             };
 
-            List<Predicate<NbtCompound>> nbtPredicates = new ArrayList<>();
+            List<Predicate<CompoundTag>> nbtPredicates = new ArrayList<>();
             for (Object o : properties.keySet())
                 if (o instanceof String property && property.startsWith("nbt.")) {
                     String matchProperty = properties.getProperty(property);
@@ -194,39 +194,39 @@ public abstract class CIT {
 
                     final boolean checkJson = (path[path.length - 1].equals("Name") || (path.length >= 2 && path[path.length - 2].equals("Lore"))) && !((matchProperty.startsWith("{") || matchProperty.startsWith("\\{")) && matchProperty.endsWith("}"));
 
-                    nbtPredicates.add(new Predicate<NbtCompound>() {
-                        public boolean test(NbtElement nbtElement, int index) {
+                    nbtPredicates.add(new Predicate<CompoundTag>() {
+                        public boolean test(Tag nbtElement, int index) {
                             if (index >= path.length) {
-                                if (nbtElement instanceof NbtString nbtString) {
-                                    String text = nbtString.asString();
+                                if (nbtElement instanceof StringTag nbtString) {
+                                    String text = nbtString.getAsString();
                                     if (checkJson)
                                         try {
                                             //noinspection ConstantConditions
-                                            text = Text.Serializer.fromJson(text).getString();
+                                            text = Component.Serializer.fromJson(text).getString();
                                         } catch (Exception ignored) { }
 
                                     return match.test(text);
-                                } else if (nbtElement instanceof AbstractNbtNumber nbtNumber)
-                                    return match.test(String.valueOf(nbtNumber.numberValue()));
+                                } else if (nbtElement instanceof NumericTag nbtNumber)
+                                    return match.test(String.valueOf(nbtNumber.getAsNumber()));
                             } else {
                                 String name = path[index];
                                 if (name.equals("*")) {
-                                    if (nbtElement instanceof NbtCompound nbtCompound) {
-                                        for (NbtElement subElement : ((NbtCompoundAccessor) nbtCompound).getEntries().values())
+                                    if (nbtElement instanceof CompoundTag nbtCompound) {
+                                        for (Tag subElement : ((NbtCompoundAccessor) nbtCompound).getEntries().values())
                                             if (test(subElement, index + 1))
                                                 return true;
-                                    } else if (nbtElement instanceof NbtList nbtList) {
-                                        for (NbtElement subElement : nbtList)
+                                    } else if (nbtElement instanceof ListTag nbtList) {
+                                        for (Tag subElement : nbtList)
                                             if (test(subElement, index + 1))
                                                 return true;
                                     }
                                 } else {
-                                    if (nbtElement instanceof NbtCompound nbtCompound) {
-                                        NbtElement subElement = nbtCompound.get(name);
+                                    if (nbtElement instanceof CompoundTag nbtCompound) {
+                                        Tag subElement = nbtCompound.get(name);
                                         return subElement != null && test(subElement, index + 1);
-                                    } else if (nbtElement instanceof NbtList nbtList) {
+                                    } else if (nbtElement instanceof ListTag nbtList) {
                                         try {
-                                            NbtElement subElement = nbtList.get(Integer.parseInt(name));
+                                            Tag subElement = nbtList.get(Integer.parseInt(name));
                                             return subElement != null && test(subElement, index + 1);
                                         } catch (Exception ignored) {
                                             return false;
@@ -238,13 +238,13 @@ public abstract class CIT {
                         }
 
                         @Override
-                        public boolean test(NbtCompound nbtCompound) {
+                        public boolean test(CompoundTag nbtCompound) {
                             return test(nbtCompound, 0);
                         }
                     });
                 }
             this.nbt = nbtCompound -> {
-                for (Predicate<NbtCompound> predicate : nbtPredicates)
+                for (Predicate<CompoundTag> predicate : nbtPredicates)
                     if(!predicate.test(nbtCompound))
                         return false;
                 return true;
@@ -256,16 +256,16 @@ public abstract class CIT {
         }
     }
 
-    public boolean test(ItemStack stack, Hand hand, World world, LivingEntity entity, boolean ignoreItemType) {
+    public boolean test(ItemStack stack, InteractionHand hand, Level world, LivingEntity entity, boolean ignoreItemType) {
         if (!ignoreItemType && !items.isEmpty() && !items.contains(stack.getItem()))
             return false;
 
-        if (!damageAny && stack.getItem().isDamageable()) {
-            int damage = stack.getDamage();
+        if (!damageAny && stack.getItem().canBeDepleted()) {
+            int damage = stack.getDamageValue();
             if (damageMask != null)
                 damage &= damageMask;
             if (damagePercentage)
-                damage = Math.round(100f * (float) stack.getDamage() / (float) stack.getMaxDamage());
+                damage = Math.round(100f * (float) stack.getDamageValue() / (float) stack.getMaxDamage());
             if (damageRange ? (damage < damageMin || damage > damageMax) : (damage != damageMin))
                 return false;
         }
@@ -280,12 +280,12 @@ public abstract class CIT {
             return false;
 
         if (!enchantmentsAny) {
-            Map<Identifier, Integer> stackEnchantments = new LinkedHashMap<>();
-            for (NbtElement nbtElement : stack.isOf(Items.ENCHANTED_BOOK) ? EnchantedBookItem.getEnchantmentNbt(stack) : stack.getEnchantments())
-                stackEnchantments.put(EnchantmentHelper.getIdFromNbt((NbtCompound) nbtElement), EnchantmentHelper.getLevelFromNbt((NbtCompound) nbtElement));
+            Map<ResourceLocation, Integer> stackEnchantments = new LinkedHashMap<>();
+            for (Tag nbtElement : stack.is(Items.ENCHANTED_BOOK) ? EnchantedBookItem.getEnchantments(stack) : stack.getEnchantmentTags())
+                stackEnchantments.put(EnchantmentHelper.getEnchantmentId((CompoundTag) nbtElement), EnchantmentHelper.getEnchantmentLevel((CompoundTag) nbtElement));
 
             boolean matches = false;
-            for (Identifier enchantment : enchantments) {
+            for (ResourceLocation enchantment : enchantments) {
                 Integer level = stackEnchantments.get(enchantment);
                 if (level != null)
                     if (enchantmentLevelsAny) {
@@ -294,8 +294,8 @@ public abstract class CIT {
                             break;
                         }
                     } else
-                        for (Pair<Integer, Integer> levelRange : enchantmentLevels)
-                            if (level >= levelRange.getLeft() && level <= levelRange.getRight()) {
+                        for (Tuple<Integer, Integer> levelRange : enchantmentLevels)
+                            if (level >= levelRange.getA() && level <= levelRange.getB()) {
                                 matches = true;
                                 break;
                             }
@@ -306,14 +306,14 @@ public abstract class CIT {
         } else if (!enchantmentLevelsAny) {
             Collection<Integer> levels = new ArrayList<>();
             levels.add(0);
-            for (NbtElement nbtElement : stack.isOf(Items.ENCHANTED_BOOK) ? EnchantedBookItem.getEnchantmentNbt(stack) : stack.getEnchantments())
-                levels.add(EnchantmentHelper.getLevelFromNbt((NbtCompound) nbtElement));
+            for (Tag nbtElement : stack.is(Items.ENCHANTED_BOOK) ? EnchantedBookItem.getEnchantments(stack) : stack.getEnchantmentTags())
+                levels.add(EnchantmentHelper.getEnchantmentLevel((CompoundTag) nbtElement));
 
             boolean matches = false;
 
             l: for (Integer level : levels) {
-                for (Pair<Integer, Integer> levelRange : enchantmentLevels) {
-                    if (level >= levelRange.getLeft() && level <= levelRange.getRight()) {
+                for (Tuple<Integer, Integer> levelRange : enchantmentLevels) {
+                    if (level >= levelRange.getA() && level <= levelRange.getB()) {
                         matches = true;
                         break l;
                     }
@@ -324,7 +324,7 @@ public abstract class CIT {
                 return false;
         }
 
-        return nbt == null || nbt.test(stack.getNbt());
+        return nbt == null || nbt.test(stack.getTag());
     }
 
     public void dispose() {
@@ -338,16 +338,16 @@ public abstract class CIT {
      * It will first try using definedPath as an absolute path, if it cant resolve(or definedPath starts with ./), definedPath will be considered relative. <br>
      * Relative paths support going to parent directories using "..".
      */
-    public static Identifier resolvePath(Identifier propertyIdentifier, String path, String extension, Predicate<Identifier> packContains) {
+    public static ResourceLocation resolvePath(ResourceLocation propertyIdentifier, String path, String extension, Predicate<ResourceLocation> packContains) {
         if (path == null) {
             path = propertyIdentifier.getPath().substring(0, propertyIdentifier.getPath().length() - 11);
             if (!path.endsWith(extension))
                 path = path + extension;
-            Identifier pathIdentifier = new Identifier(propertyIdentifier.getNamespace(), path);
+            ResourceLocation pathIdentifier = new ResourceLocation(propertyIdentifier.getNamespace(), path);
             return packContains.test(pathIdentifier) ? pathIdentifier : null;
         }
 
-        Identifier pathIdentifier = new Identifier(path);
+        ResourceLocation pathIdentifier = new ResourceLocation(path);
 
         path = pathIdentifier.getPath().replace('\\', '/');
         if (!path.endsWith(extension))
@@ -356,17 +356,17 @@ public abstract class CIT {
         if (path.startsWith("./"))
             path = path.substring(2);
         else if (!path.contains("..")) {
-            pathIdentifier = new Identifier(pathIdentifier.getNamespace(), path);
+            pathIdentifier = new ResourceLocation(pathIdentifier.getNamespace(), path);
             if (packContains.test(pathIdentifier))
                 return pathIdentifier;
             else if (path.startsWith("assets/")) {
                 path = path.substring(7);
                 int sep = path.indexOf('/');
-                pathIdentifier = new Identifier(path.substring(0, sep), path.substring(sep + 1));
+                pathIdentifier = new ResourceLocation(path.substring(0, sep), path.substring(sep + 1));
                 if (packContains.test(pathIdentifier))
                     return pathIdentifier;
             }
-            pathIdentifier = new Identifier(pathIdentifier.getNamespace(), switch (extension) {
+            pathIdentifier = new ResourceLocation(pathIdentifier.getNamespace(), switch (extension) {
                 case ".png" -> "textures/";
                 case ".json" -> "models/";
 
@@ -393,7 +393,7 @@ public abstract class CIT {
             pathParts.addLast(path);
         path = String.join("/", pathParts);
 
-        pathIdentifier = new Identifier(propertyIdentifier.getNamespace(), path);
+        pathIdentifier = new ResourceLocation(propertyIdentifier.getNamespace(), path);
 
         return packContains.test(pathIdentifier) ? pathIdentifier : null;
     }

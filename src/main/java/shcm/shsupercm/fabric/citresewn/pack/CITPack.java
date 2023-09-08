@@ -1,13 +1,13 @@
 package shcm.shsupercm.fabric.citresewn.pack;
 
-import net.minecraft.resource.ResourcePack;
 import shcm.shsupercm.fabric.citresewn.pack.cits.CIT;
 import shcm.shsupercm.fabric.citresewn.pack.cits.CITEnchantment;
 
 import java.util.*;
+import net.minecraft.server.packs.PackResources;
 
 public class CITPack {
-    public final ResourcePack resourcePack;
+    public final PackResources resourcePack;
     public final Collection<CIT> cits = new ArrayList<>();
 
     public CITEnchantment.MergeMethod method = CITEnchantment.MergeMethod.AVERAGE;
@@ -15,7 +15,7 @@ public class CITPack {
     public Float fade = 0.5f;
     public Boolean useGlint = true;
 
-    public CITPack(ResourcePack resourcePack) {
+    public CITPack(PackResources resourcePack) {
         this.resourcePack = resourcePack;
     }
 

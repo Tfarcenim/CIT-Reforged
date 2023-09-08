@@ -1,6 +1,5 @@
 package shcm.shsupercm.fabric.citresewn.mixin.citenchantment;
 
-import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -12,6 +11,7 @@ import shcm.shsupercm.fabric.citresewn.pack.cits.CITEnchantment;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.function.Supplier;
+import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin implements CITEnchantment.Cached {

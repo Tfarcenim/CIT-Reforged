@@ -1,12 +1,12 @@
 package shcm.shsupercm.fabric.citresewn.mixin.citelytra;
 
-import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
 import shcm.shsupercm.fabric.citresewn.pack.cits.CITElytra;
 
 import java.lang.ref.WeakReference;
 import java.util.function.Supplier;
+import net.minecraft.world.item.ItemStack;
 
 @Mixin(ItemStack.class)
 public class ItemStackMixin implements CITElytra.Cached {

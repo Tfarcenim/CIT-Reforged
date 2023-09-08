@@ -1,22 +1,22 @@
 package shcm.shsupercm.fabric.citresewn.mixin.cititem;
 
 import com.mojang.datafixers.util.Either;
-import net.minecraft.client.render.model.json.JsonUnbakedModel;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Map;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
 
-@Mixin(JsonUnbakedModel.class)
+@Mixin(BlockModel.class)
 public interface JsonUnbakedModelAccessor {
     @Accessor
-    Map<String, Either<SpriteIdentifier, String>> getTextureMap();
+    Map<String, Either<Material, String>> getTextureMap();
 
     @Accessor
-    Identifier getParentId();
+    ResourceLocation getParentId();
 
     @Accessor
-    void setParentId(Identifier parentId);
+    void setParentId(ResourceLocation parentId);
 }

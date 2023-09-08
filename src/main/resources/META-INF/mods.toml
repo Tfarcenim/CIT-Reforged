@@ -3,7 +3,7 @@ loaderVersion="[39,)"
 license="LGPL-3.0-only"
 [[mods]]
 modId="citresewn"
-version="${version}"
+version="${file.jarVersion}" #mandatory
 displayName="CIT Resewn"
 logoFile="logo.png"
 description='''

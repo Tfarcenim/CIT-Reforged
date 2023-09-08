@@ -258,11 +258,10 @@ public class CITItem extends CIT {
                         ResourceLocation itemIdentifier = Registry.ITEM.getKey(item);
                         overrideConditions.put(new ResourceLocation(itemIdentifier.getNamespace(), "item/" + itemIdentifier.getPath()), Collections.emptyList());
 
-                        Resource itemModelResource = null;
                         ResourceLocation itemModelIdentifier = new ResourceLocation(itemIdentifier.getNamespace(), "models/item/" + itemIdentifier.getPath() + ".json");
                         try {
-                        	itemModelResource = resourceManager.getResource(itemModelIdentifier).get();
-                        	Reader resourceReader = new InputStreamReader(itemModelResource.open());
+                            Resource itemModelResource = resourceManager.getResource(itemModelIdentifier).get();
+                            Reader resourceReader = new InputStreamReader(itemModelResource.open());
                             BlockModel itemModelJson = BlockModel.fromStream(resourceReader);
 
                             if (itemModelJson.getOverrides() != null && !itemModelJson.getOverrides().isEmpty())

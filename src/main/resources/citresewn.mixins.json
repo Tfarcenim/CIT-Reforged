@@ -5,10 +5,6 @@
   "compatibilityLevel": "JAVA_16",
   "plugin": "shcm.shsupercm.fabric.citresewn.config.CITResewnMixinConfiguration",
   "mixins": [
-    "broken_paths.AbstractFileResourcePackMixin",
-    "broken_paths.IdentifierMixin",
-    "broken_paths.ReloadableResourceManagerImplMixin",
-    "broken_paths.ResourcePackCompatibilityMixin",
     "citarmor.ArmorFeatureRendererMixin",
     "citarmor.ItemStackMixin",
     "citelytra.ElytraFeatureRendererMixin",

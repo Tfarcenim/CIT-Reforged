@@ -15,9 +15,6 @@ public class CITResewn {
 
     public CITResewnConfig config = null;
 
-
-    public boolean processingBrokenPaths = false;
-
     public CITResewn() {
     	onInitializeClient();
     }

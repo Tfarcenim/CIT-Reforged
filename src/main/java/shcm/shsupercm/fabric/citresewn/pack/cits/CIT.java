@@ -161,8 +161,8 @@ public abstract class CIT {
             }
 
             this.hand = switch (properties.getProperty("hand", "any")) {
-                case "main" -> Hand.MAIN_HAND;
-                case "off" -> Hand.OFF_HAND;
+                case "main" -> InteractionHand.MAIN_HAND;
+                case "off" -> InteractionHand.OFF_HAND;
                 default -> null;
             };
 

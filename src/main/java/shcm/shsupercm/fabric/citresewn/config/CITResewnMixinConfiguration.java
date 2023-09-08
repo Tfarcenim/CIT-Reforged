@@ -10,25 +10,15 @@ import java.util.Set;
 public class CITResewnMixinConfiguration implements IMixinConfigPlugin {
     private static final String MIXINS_ROOT = "shcm.shsupercm.fabric.citresewn.mixin";
 
-    private boolean broken_paths;
 
     @Override
     public void onLoad(String mixinPackage) {
-        CITResewnConfig launchConfig = CITResewnConfig.read();
 
-        this.broken_paths = launchConfig.broken_paths;
     }
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (!mixinClassName.startsWith(MIXINS_ROOT))
-            return false;
-        mixinClassName = mixinClassName.substring(MIXINS_ROOT.length() + 1);
-
-        if (mixinClassName.startsWith("broken_paths"))
-            return broken_paths;
-
-        return true;
+        return mixinClassName.startsWith(MIXINS_ROOT);
     }
 
 

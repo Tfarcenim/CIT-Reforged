@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.*;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;

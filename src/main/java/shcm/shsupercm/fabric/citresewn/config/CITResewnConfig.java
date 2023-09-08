@@ -13,7 +13,6 @@ public class CITResewnConfig {
     public boolean mute_warns = false;
     public float citenchantment_scroll_multiplier = 8f;
     public int cache_ms = 50;
-    public boolean broken_paths = false;
 
     private static final File FILE = new File("config/citresewn.json");
     public static CITResewnConfig INSTANCE() {

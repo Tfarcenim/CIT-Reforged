@@ -10,7 +10,6 @@ import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.render.*;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
@@ -184,7 +183,7 @@ public class CITEnchantment extends CIT {
             return RenderType.create("citresewn:enchantment_" + this.name + ":" + enchantment.propertiesIdentifier.toString(),
                     DefaultVertexFormat.POSITION_TEX,
                     VertexFormat.Mode.QUADS,
-                    256,
+                    256,false,false,
                     layer.createCompositeState(false));
         }
 

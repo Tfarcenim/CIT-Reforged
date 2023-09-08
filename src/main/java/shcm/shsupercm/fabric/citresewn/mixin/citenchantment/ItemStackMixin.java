@@ -28,7 +28,7 @@ public class ItemStackMixin implements CITEnchantment.Cached {
         return citresewn_cachedCITEnchantment.get();
     }
 
-    @Inject(method = "hasGlint", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "hasFoil", cancellable = true, at = @At("HEAD"))
     private void disableDefaultGlint(CallbackInfoReturnable<Boolean> cir) {
         if (CITResewn.INSTANCE.activeCITs != null && ((!CITResewn.INSTANCE.activeCITs.effectiveGlobalProperties.useGlint) || (CITEnchantment.appliedContext != null && CITEnchantment.shouldApply && !CITEnchantment.appliedContext.get(0).useGlint)))
             cir.setReturnValue(false);

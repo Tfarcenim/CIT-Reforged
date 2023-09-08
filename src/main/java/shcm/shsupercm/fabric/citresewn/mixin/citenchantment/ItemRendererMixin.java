@@ -31,20 +31,20 @@ public class ItemRendererMixin {
             CITResewn.INSTANCE.activeCITs.setEnchantmentAppliedContextCached(stack, world, entity);
     }
 
-    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     private void startApplyingItem(ItemStack stack, ItemTransforms.TransformType renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
         if (CITResewnConfig.INSTANCE().enabled)
             CITEnchantment.shouldApply = true;
     }
 
-    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At("TAIL"))
+    @Inject(method = "render", at = @At("TAIL"))
     private void stopApplyingItem(ItemStack stack, ItemTransforms.TransformType renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
         CITEnchantment.shouldApply = false;
         if (CITResewn.INSTANCE.activeCITs != null)
             CITResewn.INSTANCE.activeCITs.setEnchantmentAppliedContextCached(null, null, null);
     }
 
-    @Inject(method = "getArmorGlintConsumer", cancellable = true, at = @At("RETURN"))
+    @Inject(method = "getArmorFoilBuffer", cancellable = true, at = @At("RETURN"))
     private static void getArmorGlintConsumer(MultiBufferSource provider, RenderType layer, boolean solid, boolean glint, CallbackInfoReturnable<VertexConsumer> cir) {
         if (!CITEnchantment.shouldApply)
             return;
@@ -53,7 +53,7 @@ public class ItemRendererMixin {
             cir.setReturnValue(vertexConsumer);
     }
 
-    @Inject(method = "getCompassGlintConsumer", cancellable = true, at = @At("RETURN"))
+    @Inject(method = "getCompassFoilBuffer", cancellable = true, at = @At("RETURN"))
     private static void getCompassGlintConsumer(MultiBufferSource provider, RenderType layer, PoseStack.Pose entry, CallbackInfoReturnable<VertexConsumer> cir) {
         if (!CITEnchantment.shouldApply)
             return;
@@ -62,7 +62,7 @@ public class ItemRendererMixin {
             cir.setReturnValue(VertexMultiConsumer.create(new SheetedDecalTextureGenerator(vertexConsumer, entry.pose(), entry.normal()), cir.getReturnValue()));
     }
 
-    @Inject(method = "getDirectCompassGlintConsumer", cancellable = true, at = @At("RETURN"))
+    @Inject(method = "getCompassFoilBufferDirect", cancellable = true, at = @At("RETURN"))
     private static void getDirectCompassGlintConsumer(MultiBufferSource provider, RenderType layer, PoseStack.Pose entry, CallbackInfoReturnable<VertexConsumer> cir) {
         if (!CITEnchantment.shouldApply)
             return;
@@ -71,7 +71,7 @@ public class ItemRendererMixin {
             cir.setReturnValue(VertexMultiConsumer.create(new SheetedDecalTextureGenerator(vertexConsumer, entry.pose(), entry.normal()), cir.getReturnValue()));
     }
 
-    @Inject(method = "getItemGlintConsumer", cancellable = true, at = @At("RETURN"))
+    @Inject(method = "getFoilBuffer", cancellable = true, at = @At("RETURN"))
     private static void getItemGlintConsumer(MultiBufferSource provider, RenderType layer, boolean solid, boolean glint, CallbackInfoReturnable<VertexConsumer> cir) {
         if (!CITEnchantment.shouldApply)
             return;
@@ -80,7 +80,7 @@ public class ItemRendererMixin {
             cir.setReturnValue(vertexConsumer);
     }
 
-    @Inject(method = "getDirectItemGlintConsumer", cancellable = true, at = @At("RETURN"))
+    @Inject(method = "getFoilBufferDirect", cancellable = true, at = @At("RETURN"))
     private static void getDirectItemGlintConsumer(MultiBufferSource provider, RenderType layer, boolean solid, boolean glint, CallbackInfoReturnable<VertexConsumer> cir) {
         if (!CITEnchantment.shouldApply)
             return;

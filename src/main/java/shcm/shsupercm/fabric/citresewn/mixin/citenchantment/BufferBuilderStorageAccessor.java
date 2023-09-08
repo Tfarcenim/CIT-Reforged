@@ -9,6 +9,6 @@ import net.minecraft.client.renderer.RenderType;
 
 @Mixin(RenderBuffers.class)
 public interface BufferBuilderStorageAccessor {
-    @Accessor("entityBuilders")
+    @Accessor("fixedBuffers")
     SortedMap<RenderType, BufferBuilder> entityBuilders();
 }

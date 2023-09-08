@@ -16,7 +16,7 @@ import shcm.shsupercm.fabric.citresewn.pack.cits.CITEnchantment;
 
 @Mixin(HumanoidArmorLayer.class)
 public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> {
-    @Inject(method = "renderArmor", at = @At("HEAD"))
+    @Inject(method = "renderArmorPiece", at = @At("HEAD"))
     private void setAppliedContextAndStartApplyingArmor(PoseStack matrices, MultiBufferSource vertexConsumers, T livingEntity, EquipmentSlot armorSlot, int light, A model, CallbackInfo ci) {
         if (CITResewnConfig.INSTANCE().enabled && CITResewn.INSTANCE.activeCITs != null) {
             CITResewn.INSTANCE.activeCITs.setEnchantmentAppliedContextCached(livingEntity.getItemBySlot(armorSlot), livingEntity.level, livingEntity);
@@ -24,7 +24,7 @@ public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends Humanoi
         }
     }
 
-    @Inject(method = "renderArmor", at = @At("RETURN"))
+    @Inject(method = "renderArmorPiece", at = @At("RETURN"))
     private void stopApplyingArmor(PoseStack matrices, MultiBufferSource vertexConsumers, T livingEntity, EquipmentSlot armorSlot, int light, A model, CallbackInfo ci) {
         CITEnchantment.shouldApply = false;
         if (CITResewn.INSTANCE.activeCITs != null)

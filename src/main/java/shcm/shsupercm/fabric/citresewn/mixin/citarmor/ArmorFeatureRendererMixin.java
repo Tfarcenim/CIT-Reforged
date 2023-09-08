@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends HumanoidModel<T>, A extends HumanoidModel<T>> {
     private WeakReference<Map<String, ResourceLocation>> armorTexturesCached = null;
 
-    @Inject(method = "renderArmor", at = @At("HEAD"))
+    @Inject(method = "renderArmorPiece", at = @At("HEAD"))
     private void renderArmor(PoseStack matrices, MultiBufferSource vertexConsumers, T entity, EquipmentSlot armorSlot, int light, A model, CallbackInfo ci) {
         if (!CITResewnConfig.INSTANCE().enabled || CITResewn.INSTANCE.activeCITs == null)
             return;
@@ -39,7 +39,7 @@ public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends Humanoi
         armorTexturesCached = null;
     }
 
-    @Inject(method = "getArmorTexture", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "getArmorLocation", cancellable = true, at = @At("HEAD"))
     private void getArmorTexture(ArmorItem item, boolean legs, String overlay, CallbackInfoReturnable<ResourceLocation> cir) {
         if (armorTexturesCached == null)
             return;

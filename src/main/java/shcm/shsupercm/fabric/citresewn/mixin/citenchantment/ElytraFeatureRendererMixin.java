@@ -15,7 +15,7 @@ import shcm.shsupercm.fabric.citresewn.pack.cits.CITEnchantment;
 
 @Mixin(ElytraLayer.class)
 public class ElytraFeatureRendererMixin {
-    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/LivingEntity;FFFFFF)V", at = @At("HEAD"))
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V", at = @At("HEAD"))
     private void setAppliedContextAndStartApplyingElytra(PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i, LivingEntity livingEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
         if (CITResewnConfig.INSTANCE().enabled && CITResewn.INSTANCE.activeCITs != null) {
             CITResewn.INSTANCE.activeCITs.setEnchantmentAppliedContextCached(livingEntity.getItemBySlot(EquipmentSlot.CHEST), livingEntity.level, livingEntity);
@@ -23,7 +23,7 @@ public class ElytraFeatureRendererMixin {
         }
     }
 
-    @Inject(method = "render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"))
+    @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/LivingEntity;FFFFFF)V", at = @At("RETURN"))
     private void stopApplyingElytra(PoseStack matrixStack, MultiBufferSource vertexConsumerProvider, int i, LivingEntity livingEntity, float f, float g, float h, float j, float k, float l, CallbackInfo ci) {
         CITEnchantment.shouldApply = false;
         if (CITResewn.INSTANCE.activeCITs != null)

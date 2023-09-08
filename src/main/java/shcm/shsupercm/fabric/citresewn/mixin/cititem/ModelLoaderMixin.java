@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
@@ -38,13 +37,14 @@ import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
 
 @Mixin(ModelBakery.class)
 public class ModelLoaderMixin {
-    @Shadow @Final private ResourceManager resourceManager;
-    @Shadow @Final private Set<ResourceLocation> modelsToLoad;
-    @Shadow @Final private Map<ResourceLocation, UnbakedModel> modelsToBake;
-    @Shadow @Final private Map<ResourceLocation, UnbakedModel> unbakedModels;
-    @Shadow @Final private Map<ResourceLocation, BakedModel> bakedModels;
+    @Shadow @Final
+    protected ResourceManager resourceManager;
+    @Shadow @Final private Set<ResourceLocation> loadingStack;
+    @Shadow @Final private Map<ResourceLocation, UnbakedModel> topLevelModels;
+    @Shadow @Final private Map<ResourceLocation, UnbakedModel> unbakedCache;
+    @Shadow @Final private Map<ResourceLocation, BakedModel> bakedTopLevelModels;
 
-    @Inject(method = "addModel", at = @At("TAIL"))
+    @Inject(method = "loadTopLevel", at = @At("TAIL"))//todo: is this correct
     public void addCITItemModels(ModelResourceLocation eventModelId, CallbackInfo ci) { if (eventModelId != ModelBakery.MISSING_MODEL_LOCATION) return;
         if (CITResewn.INSTANCE.activeCITs == null)
             return;
@@ -59,9 +59,9 @@ public class ModelLoaderMixin {
 
                         for (BlockModel unbakedModel : citItem.unbakedAssets.values()) {
                             ResewnItemModelIdentifier id = new ResewnItemModelIdentifier(unbakedModel.name);
-                            this.unbakedModels.put(id, unbakedModel);
-                            this.modelsToLoad.addAll(unbakedModel.getDependencies());
-                            this.modelsToBake.put(id, unbakedModel);
+                            this.unbakedCache.put(id, unbakedModel);
+                            this.loadingStack.addAll(unbakedModel.getDependencies());
+                            this.topLevelModels.put(id, unbakedModel);
                         }
                     } catch (Exception e) {
                         CITResewn.logErrorLoading(e.getMessage());
@@ -71,7 +71,7 @@ public class ModelLoaderMixin {
         CITItem.GENERATED_SUB_CITS_SEEN.clear();
     }
 
-    @Inject(method = "upload", at = @At("RETURN"))
+    @Inject(method = "uploadTextures", at = @At("RETURN"))
     public void linkBakedCITItemModels(TextureManager textureManager, ProfilerFiller profiler, CallbackInfoReturnable<AtlasSet> cir) {
         if (CITResewn.INSTANCE.activeCITs == null)
             return;
@@ -83,9 +83,9 @@ public class ModelLoaderMixin {
             for (CITItem citItem : CITResewn.INSTANCE.activeCITs.citItems.values().stream().flatMap(Collection::stream).distinct().collect(Collectors.toList())) {
                 for (Map.Entry<List<ItemOverride.Predicate>, BlockModel> citModelEntry : citItem.unbakedAssets.entrySet()) {
                     if (citModelEntry.getKey() == null) {
-                        citItem.bakedModel = this.bakedModels.get(new ResewnItemModelIdentifier(citModelEntry.getValue().name));
+                        citItem.bakedModel = this.bakedTopLevelModels.get(new ResewnItemModelIdentifier(citModelEntry.getValue().name));
                     } else {
-                        BakedModel bakedModel = bakedModels.get(new ResewnItemModelIdentifier(citModelEntry.getValue().name));
+                        BakedModel bakedModel = bakedTopLevelModels.get(new ResewnItemModelIdentifier(citModelEntry.getValue().name));
 
                         if (bakedModel == null)
                             CITResewn.logWarnLoading("Skipping sub cit: Failed loading model for \"" + citModelEntry.getValue().name + "\" in " + citItem.pack.resourcePack.getName() + " -> " + citItem.propertiesIdentifier.getPath());
@@ -101,7 +101,7 @@ public class ModelLoaderMixin {
     }
 
 
-    @Inject(method = "loadModelFromJson", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "loadBlockModel", cancellable = true, at = @At("HEAD"))
     public void forceLiteralResewnModelIdentifier(ResourceLocation id, CallbackInfoReturnable<BlockModel> cir) {
         if (id instanceof ResewnItemModelIdentifier) {
             InputStream is = null;
@@ -125,13 +125,13 @@ public class ModelLoaderMixin {
                     return original;
                 });
 
-                ResourceLocation parentId = ((JsonUnbakedModelAccessor) json).getParentId();
+                ResourceLocation parentId = ((JsonUnbakedModelAccessor) json).getParentLocation();
                 if (parentId != null) {
                     String[] parentIdPathSplit = parentId.getPath().split("/");
                     if (parentId.getPath().startsWith("./") || (parentIdPathSplit.length > 2 && parentIdPathSplit[1].equals("cit"))) {
                         parentId = CIT.resolvePath(id, parentId.getPath(), ".json", identifier -> resourceManager.getResource(identifier).isPresent());
                         if (parentId != null)
-                            ((JsonUnbakedModelAccessor) json).setParentId(new ResewnItemModelIdentifier(parentId));
+                            ((JsonUnbakedModelAccessor) json).setParentLocation(new ResewnItemModelIdentifier(parentId));
                     }
                 }
 

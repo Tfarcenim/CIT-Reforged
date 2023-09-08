@@ -10,5 +10,5 @@ import net.minecraft.nbt.Tag;
 @Mixin(CompoundTag.class)
 public interface NbtCompoundAccessor {
     @Accessor
-    Map<String, Tag> getEntries();
+    Map<String, Tag> getTags();
 }

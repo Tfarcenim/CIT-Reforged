@@ -24,9 +24,10 @@ import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
 
 @Mixin(value = ModelBakery.class, priority = 999)
 public abstract class ModelLoaderMixin {
-    @Shadow @Final private ResourceManager resourceManager;
+    @Shadow @Final
+    protected ResourceManager resourceManager;
 
-    @Inject(method = "addModel", at = @At("TAIL"))
+    @Inject(method = "loadTopLevel", at = @At("TAIL"))
     public void initCITs(ModelResourceLocation eventModelId, CallbackInfo ci) { if (eventModelId != ModelBakery.MISSING_MODEL_LOCATION) return;
         if (CITResewn.INSTANCE.activeCITs != null) {
             info("Clearing active CITs..");

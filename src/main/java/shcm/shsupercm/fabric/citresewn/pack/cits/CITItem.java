@@ -348,13 +348,13 @@ public class CITItem extends CIT {
                     jsonTextureMap.values().removeIf(Objects::isNull);
                 }
 
-                ResourceLocation parentId = ((JsonUnbakedModelAccessor) json).getParentId();
+                ResourceLocation parentId = ((JsonUnbakedModelAccessor) json).getParentLocation();
                 if (parentId != null) {
                     String[] parentIdPathSplit = parentId.getPath().split("/");
                     if (parentId.getPath().startsWith("./") || (parentIdPathSplit.length > 2 && parentIdPathSplit[1].equals("cit"))) {
                         parentId = resolvePath(identifier, parentId.getPath(), ".json", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
                         if (parentId != null)
-                            ((JsonUnbakedModelAccessor) json).setParentId(new ResewnItemModelIdentifier(parentId));
+                            ((JsonUnbakedModelAccessor) json).setParentLocation(new ResewnItemModelIdentifier(parentId));
                     }
                 }
 

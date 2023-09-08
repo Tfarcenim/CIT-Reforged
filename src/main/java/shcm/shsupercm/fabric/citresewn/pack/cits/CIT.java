@@ -212,7 +212,7 @@ public abstract class CIT {
                                 String name = path[index];
                                 if (name.equals("*")) {
                                     if (nbtElement instanceof CompoundTag nbtCompound) {
-                                        for (Tag subElement : ((NbtCompoundAccessor) nbtCompound).getEntries().values())
+                                        for (Tag subElement : ((NbtCompoundAccessor) nbtCompound).getTags().values())
                                             if (test(subElement, index + 1))
                                                 return true;
                                     } else if (nbtElement instanceof ListTag nbtList) {

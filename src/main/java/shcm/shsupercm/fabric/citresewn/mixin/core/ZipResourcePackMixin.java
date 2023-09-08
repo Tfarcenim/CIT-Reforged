@@ -21,13 +21,13 @@ import net.minecraft.server.packs.PackType;
 
 @Mixin(FilePackResources.class)
 public abstract class ZipResourcePackMixin {
-    @Shadow protected abstract ZipFile getZipFile() throws IOException;
+    @Shadow protected abstract ZipFile getOrCreateZipFile() throws IOException;
 
-    @Inject(method = "findResources", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "getResources", cancellable = true, at = @At("HEAD"))
     public void fixDepthBug(PackType type, String namespace, String prefix, Predicate<String> pathFilter, CallbackInfoReturnable<Collection<ResourceLocation>> cir) {
         ZipFile zipFile2;
         try {
-            zipFile2 = this.getZipFile();
+            zipFile2 = this.getOrCreateZipFile();
         } catch (IOException var15) {
             cir.setReturnValue(Collections.emptySet()); return;
         }

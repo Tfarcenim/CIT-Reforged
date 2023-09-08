@@ -15,8 +15,8 @@ public interface JsonUnbakedModelAccessor {
     Map<String, Either<Material, String>> getTextureMap();
 
     @Accessor
-    ResourceLocation getParentId();
+    ResourceLocation getParentLocation();
 
     @Accessor
-    void setParentId(ResourceLocation parentId);
+    void setParentLocation(ResourceLocation parentId);
 }

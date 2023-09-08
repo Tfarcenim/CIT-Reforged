@@ -10,7 +10,7 @@ import shcm.shsupercm.fabric.citresewn.pack.ResewnTextureIdentifier;
 
 @Mixin(TextureAtlas.class)
 public class SpriteAtlasTextureMixin {
-    @Inject(method = "getTexturePath", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "getResourceLocation", cancellable = true, at = @At("HEAD"))
     public void forceLiteralResewnTextureIdentifier(ResourceLocation id, CallbackInfoReturnable<ResourceLocation> cir) {
         if (id instanceof ResewnTextureIdentifier)
             cir.setReturnValue(id);

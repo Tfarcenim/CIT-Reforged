@@ -1,0 +1,35 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "shcm.shsupercm.fabric.citresewn.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "plugin": "shcm.shsupercm.fabric.citresewn.config.CITResewnMixinConfiguration",
+  "mixins": [
+    "broken_paths.AbstractFileResourcePackMixin",
+    "broken_paths.IdentifierMixin",
+    "broken_paths.ReloadableResourceManagerImplMixin",
+    "broken_paths.ResourcePackCompatibilityMixin",
+    "citarmor.ArmorFeatureRendererMixin",
+    "citarmor.ItemStackMixin",
+    "citelytra.ElytraFeatureRendererMixin",
+    "citelytra.ItemStackMixin",
+    "citenchantment.ArmorFeatureRendererMixin",
+    "citenchantment.BufferBuilderStorageAccessor",
+    "citenchantment.ElytraFeatureRendererMixin",
+    "citenchantment.ItemRendererMixin",
+    "citenchantment.ItemStackMixin",
+    "citenchantment.RenderPhaseAccessor",
+    "citenchantment.MinecraftClientMixin",
+    "cititem.ItemRendererMixin",
+    "cititem.ItemStackMixin",
+    "cititem.JsonUnbakedModelAccessor",
+    "cititem.ModelLoaderMixin",
+    "core.ModelLoaderMixin",
+    "core.NbtCompoundAccessor",
+    "core.SpriteAtlasTextureMixin"
+    //"core.ZipResourcePackMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

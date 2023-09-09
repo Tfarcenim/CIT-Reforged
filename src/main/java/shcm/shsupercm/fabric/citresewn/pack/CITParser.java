@@ -60,21 +60,15 @@ public final class CITParser { private CITParser() {}
             if (ResourceLocation.isValidResourceLocation(namespace))
                 for (String citRoot : new String[] { "citresewn", "optifine", "mcpatcher" }) {
 
-                    ResourceLocation identifier = new ResourceLocation(namespace, citRoot + "/cit.properties");
-
-                    IoSupplier<InputStream> citPropertiesSupplier = resourcePack.getResource(PackType.CLIENT_RESOURCES, identifier);
-                    if (citPropertiesSupplier != null) {
 
                         List<ResourceLocation> locations = new ArrayList<>();
-
                         resourcePack.listResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", (resourceLocation, inputStreamIoSupplier) -> locations.add(resourceLocation));
                         packProperties.addAll(locations);
                         //     packProperties.addAll(resourcePack.getResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", s -> s.getPath().endsWith(".properties")));
                         ResourceLocation global = new ResourceLocation(namespace, citRoot + "/cit.properties");
-                        if (/*resourcePack.getResource(PackType.CLIENT_RESOURCES, global)*/ true)
+                        if (resourcePack.getResource(PackType.CLIENT_RESOURCES, global) != null)
                             packProperties.add(global);
                     }
-                }
 
         boolean readGlobalProperties = false;
         for (Iterator<ResourceLocation> iterator = packProperties.iterator(); iterator.hasNext(); ) {

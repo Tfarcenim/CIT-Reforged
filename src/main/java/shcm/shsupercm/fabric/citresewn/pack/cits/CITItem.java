@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import org.apache.commons.io.IOUtils;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
@@ -54,6 +55,8 @@ public class CITItem extends CIT {
     public CITItem(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException {
         super(pack, identifier, properties);
 
+        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+
 
         try {
             if (this.items.size() == 0)
@@ -89,6 +92,7 @@ public class CITItem extends CIT {
                     ResourceLocation subItemIdentifier = fixDeprecatedSubItem(subItem);
                     assetIdentifiers.put(subItemIdentifier == null ? new ResourceLocation("minecraft", "item/" + subItem) : subItemIdentifier, subIdentifier);
                 }
+
 
             if (assetIdentifiers.size() == 0) { // attempt to load texture
                 isTexture = true;

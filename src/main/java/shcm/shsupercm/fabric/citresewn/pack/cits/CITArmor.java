@@ -1,5 +1,8 @@
 package shcm.shsupercm.fabric.citresewn.pack.cits;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
+import org.openjdk.nashorn.internal.objects.NativeUint8Array;
 import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
 import shcm.shsupercm.fabric.citresewn.pack.CITPack;
 
@@ -21,11 +24,11 @@ public class CITArmor extends CIT {
                 throw new Exception("CIT must target at least one item type");
             for (Item item : this.items)
                 if (!(item instanceof ArmorItem))
-                    throw new Exception("Armor CIT must target armor items only(" + Registry.ITEM.getKey(item) + " is not armor)");
+                    throw new Exception("Armor CIT must target armor items only(" + BuiltInRegistries.ITEM.getKey(item) + " is not armor)");
 
             for (Object o : properties.keySet())
                 if (o instanceof String property && property.startsWith("texture.")) {
-                    ResourceLocation textureIdentifier = resolvePath(identifier, properties.getProperty(property), ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                    ResourceLocation textureIdentifier = resolvePath(identifier, properties.getProperty(property), ".png", Minecraft.getInstance().getResourceManager());
                     if (textureIdentifier == null)
                         throw new Exception("Cannot resolve path for " + property);
 

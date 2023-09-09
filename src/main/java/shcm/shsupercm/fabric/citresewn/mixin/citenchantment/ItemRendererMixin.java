@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,13 +33,13 @@ public class ItemRendererMixin {
     }
 
     @Inject(method = "render", at = @At("HEAD"))
-    private void startApplyingItem(ItemStack stack, ItemTransforms.TransformType renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
+    private void startApplyingItem(ItemStack stack, ItemDisplayContext renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
         if (CITResewnConfig.INSTANCE().enabled)
             CITEnchantment.shouldApply = true;
     }
 
     @Inject(method = "render", at = @At("TAIL"))
-    private void stopApplyingItem(ItemStack stack, ItemTransforms.TransformType renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
+    private void stopApplyingItem(ItemStack stack, ItemDisplayContext renderMode, boolean leftHanded, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
         CITEnchantment.shouldApply = false;
         if (CITResewn.INSTANCE.activeCITs != null)
             CITResewn.INSTANCE.activeCITs.setEnchantmentAppliedContextCached(null, null, null);
@@ -59,7 +60,7 @@ public class ItemRendererMixin {
             return;
         VertexConsumer vertexConsumer = CITEnchantment.GlintRenderLayer.GLINT.tryApply(null, layer, provider);
         if (vertexConsumer != null)
-            cir.setReturnValue(VertexMultiConsumer.create(new SheetedDecalTextureGenerator(vertexConsumer, entry.pose(), entry.normal()), cir.getReturnValue()));
+            cir.setReturnValue(VertexMultiConsumer.create(new SheetedDecalTextureGenerator(vertexConsumer, entry.pose(), entry.normal(),1), cir.getReturnValue()));
     }
 
     @Inject(method = "getCompassFoilBufferDirect", cancellable = true, at = @At("RETURN"))
@@ -68,7 +69,7 @@ public class ItemRendererMixin {
             return;
         VertexConsumer vertexConsumer = CITEnchantment.GlintRenderLayer.DIRECT_GLINT.tryApply(null, layer, provider);
         if (vertexConsumer != null)
-            cir.setReturnValue(VertexMultiConsumer.create(new SheetedDecalTextureGenerator(vertexConsumer, entry.pose(), entry.normal()), cir.getReturnValue()));
+            cir.setReturnValue(VertexMultiConsumer.create(new SheetedDecalTextureGenerator(vertexConsumer, entry.pose(), entry.normal(),1), cir.getReturnValue()));
     }
 
     @Inject(method = "getFoilBuffer", cancellable = true, at = @At("RETURN"))

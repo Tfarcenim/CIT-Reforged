@@ -8,6 +8,6 @@ import net.minecraft.server.packs.PackResources;
  */
 public class CITParseException extends Exception {
     public CITParseException(PackResources resourcePack, ResourceLocation identifier, String message) {
-        super("Skipped CIT: " + message + " in " + resourcePack.getName() + " -> " + identifier.toString());
+        super("Skipped CIT: " + message + " in " + resourcePack.packId() + " -> " + identifier.toString());
     }
 }

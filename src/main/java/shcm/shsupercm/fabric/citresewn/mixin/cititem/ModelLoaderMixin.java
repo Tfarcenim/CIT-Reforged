@@ -1,6 +1,8 @@
 package shcm.shsupercm.fabric.citresewn.mixin.cititem;
 
 import com.mojang.datafixers.util.Either;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.apache.commons.io.IOUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,10 +20,10 @@ import shcm.shsupercm.fabric.citresewn.pack.cits.CITItem;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemOverride;
-import net.minecraft.client.renderer.texture.AtlasSet;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -37,8 +39,7 @@ import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
 
 @Mixin(ModelBakery.class)
 public class ModelLoaderMixin {
-    @Shadow @Final
-    protected ResourceManager resourceManager;
+    protected ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
     @Shadow @Final private Set<ResourceLocation> loadingStack;
     @Shadow @Final private Map<ResourceLocation, UnbakedModel> topLevelModels;
     @Shadow @Final private Map<ResourceLocation, UnbakedModel> unbakedCache;
@@ -71,12 +72,12 @@ public class ModelLoaderMixin {
         CITItem.GENERATED_SUB_CITS_SEEN.clear();
     }
 
-    @Inject(method = "uploadTextures", at = @At("RETURN"))
-    public void linkBakedCITItemModels(TextureManager textureManager, ProfilerFiller profiler, CallbackInfoReturnable<AtlasSet> cir) {
+    @Inject(method = "bakeModels", at = @At("RETURN"))
+    public void linkBakedCITItemModels(BiFunction<ResourceLocation, Material, TextureAtlasSprite> map, CallbackInfo ci) {
         if (CITResewn.INSTANCE.activeCITs == null)
             return;
 
-        profiler.push("citresewn_linking");
+   //     profiler.push("citresewn_linking");
         info("Linking baked models to CITItems...");
 
         if (CITResewn.INSTANCE.activeCITs != null) {
@@ -88,7 +89,7 @@ public class ModelLoaderMixin {
                         BakedModel bakedModel = bakedTopLevelModels.get(new ResewnItemModelIdentifier(citModelEntry.getValue().name));
 
                         if (bakedModel == null)
-                            CITResewn.logWarnLoading("Skipping sub cit: Failed loading model for \"" + citModelEntry.getValue().name + "\" in " + citItem.pack.resourcePack.getName() + " -> " + citItem.propertiesIdentifier.getPath());
+                            CITResewn.logWarnLoading("Skipping sub cit: Failed loading model for \"" + citModelEntry.getValue().name + "\" in " + citItem.pack.resourcePack.packId() + " -> " + citItem.propertiesIdentifier.getPath());
                         else
                             citItem.bakedSubModels.override(citModelEntry.getKey(), bakedModel);
                     }
@@ -97,7 +98,7 @@ public class ModelLoaderMixin {
             }
         }
 
-        profiler.pop();
+     //   profiler.pop();
     }
 
 
@@ -117,7 +118,7 @@ public class ModelLoaderMixin {
                         String originalPath = left.get().texture().getPath();
                         String[] split = originalPath.split("/");
                         if (originalPath.startsWith("./") || (split.length > 2 && split[1].equals("cit"))) {
-                            ResourceLocation resolvedIdentifier = CIT.resolvePath(id, originalPath, ".png", identifier -> resourceManager.getResource(identifier).isPresent());
+                            ResourceLocation resolvedIdentifier = CIT.resolvePath(id, originalPath, ".png",  resourceManager);
                             if (resolvedIdentifier != null)
                                 return Either.left(new Material(left.get().atlasLocation(), new ResewnTextureIdentifier(resolvedIdentifier)));
                         }
@@ -129,7 +130,7 @@ public class ModelLoaderMixin {
                 if (parentId != null) {
                     String[] parentIdPathSplit = parentId.getPath().split("/");
                     if (parentId.getPath().startsWith("./") || (parentIdPathSplit.length > 2 && parentIdPathSplit[1].equals("cit"))) {
-                        parentId = CIT.resolvePath(id, parentId.getPath(), ".json", identifier -> resourceManager.getResource(identifier).isPresent());
+                        parentId = CIT.resolvePath(id, parentId.getPath(), ".json", resourceManager);
                         if (parentId != null)
                             ((JsonUnbakedModelAccessor) json).setParentLocation(new ResewnItemModelIdentifier(parentId));
                     }
@@ -138,7 +139,7 @@ public class ModelLoaderMixin {
                 json.getOverrides().replaceAll(override -> {
                     String[] modelIdPathSplit = override.getModel().getPath().split("/");
                     if (override.getModel().getPath().startsWith("./") || (modelIdPathSplit.length > 2 && modelIdPathSplit[1].equals("cit"))) {
-                        ResourceLocation resolvedOverridePath = CIT.resolvePath(id, override.getModel().getPath(), ".json", identifier -> resourceManager.getResource(identifier).isPresent());
+                        ResourceLocation resolvedOverridePath = CIT.resolvePath(id, override.getModel().getPath(), ".json", resourceManager);
                         if (resolvedOverridePath != null)
                             return new ItemOverride(new ResewnItemModelIdentifier(resolvedOverridePath), override.getPredicates().collect(Collectors.toList()));
                     }

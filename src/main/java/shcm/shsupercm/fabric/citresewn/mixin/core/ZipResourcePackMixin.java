@@ -23,7 +23,7 @@ import net.minecraft.server.packs.PackType;
 public abstract class ZipResourcePackMixin {
     @Shadow protected abstract ZipFile getOrCreateZipFile() throws IOException;
 
-    @Inject(method = "getResources", cancellable = true, at = @At("HEAD"))
+  //  @Inject(method = "get", cancellable = true, at = @At("HEAD"))
     public void fixDepthBug(PackType type, String namespace, String prefix, Predicate<String> pathFilter, CallbackInfoReturnable<Collection<ResourceLocation>> cir) {
         ZipFile zipFile2;
         try {

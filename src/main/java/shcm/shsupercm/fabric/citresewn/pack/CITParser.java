@@ -1,5 +1,6 @@
 package shcm.shsupercm.fabric.citresewn.pack;
 
+import net.minecraft.server.packs.resources.IoSupplier;
 import org.apache.commons.lang3.StringUtils;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
 import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
@@ -36,10 +37,14 @@ public final class CITParser { private CITParser() {}
      * @return a collection of parsed CITs
      */
     public static List<CITPack> parseCITs(Collection<PackResources> packs) {
-        return packs.stream()
-                .map(CITParser::parse)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        List<CITPack> list = new ArrayList<>();
+        for (PackResources pack : packs) {
+            Collection<CITPack> parse = parse(pack);
+            for (CITPack citPack : parse) {
+                list.add(citPack);
+            }
+        }
+        return list;
     }
 
     /**
@@ -54,10 +59,21 @@ public final class CITParser { private CITParser() {}
         for (String namespace : resourcePack.getNamespaces(PackType.CLIENT_RESOURCES))
             if (ResourceLocation.isValidResourceLocation(namespace))
                 for (String citRoot : new String[] { "citresewn", "optifine", "mcpatcher" }) {
-                    packProperties.addAll(resourcePack.getResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", s -> s.getPath().endsWith(".properties")));
-                    ResourceLocation global = new ResourceLocation(namespace, citRoot + "/cit.properties");
-                    if (resourcePack.hasResource(PackType.CLIENT_RESOURCES, global))
-                        packProperties.add(global);
+
+                    ResourceLocation identifier = new ResourceLocation(namespace, citRoot + "/cit.properties");
+
+                    IoSupplier<InputStream> citPropertiesSupplier = resourcePack.getResource(PackType.CLIENT_RESOURCES, identifier);
+                    if (citPropertiesSupplier != null) {
+
+                        List<ResourceLocation> locations = new ArrayList<>();
+
+                        resourcePack.listResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", (resourceLocation, inputStreamIoSupplier) -> locations.add(resourceLocation));
+                        packProperties.addAll(locations);
+                        //     packProperties.addAll(resourcePack.getResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", s -> s.getPath().endsWith(".properties")));
+                        ResourceLocation global = new ResourceLocation(namespace, citRoot + "/cit.properties");
+                        if (/*resourcePack.getResource(PackType.CLIENT_RESOURCES, global)*/ true)
+                            packProperties.add(global);
+                    }
                 }
 
         boolean readGlobalProperties = false;
@@ -67,7 +83,7 @@ public final class CITParser { private CITParser() {}
                 if (StringUtils.countMatches(propertiesIdentifier.getPath(), '/') <= 2 && propertiesIdentifier.getPath().endsWith("cit.properties")) {
                     iterator.remove();
                     if (!readGlobalProperties)
-                        try (InputStream is = resourcePack.getResource(PackType.CLIENT_RESOURCES, propertiesIdentifier)) {
+                        try (InputStream is = resourcePack.getResource(PackType.CLIENT_RESOURCES, propertiesIdentifier).get()) {
                             Properties citProperties = new Properties();
                             citProperties.load(is);
                             citPack.loadGlobalProperties(citProperties);
@@ -75,13 +91,13 @@ public final class CITParser { private CITParser() {}
                         }
                 }
             } catch (Exception e) {
-                CITResewn.logErrorLoading("Skipped global properties: " + e.getMessage() + " in " + resourcePack.getName() + " -> " + propertiesIdentifier);
+                CITResewn.logErrorLoading("Skipped global properties: " + e.getMessage() + " in " + resourcePack.packId() + " -> " + propertiesIdentifier);
             }
         }
 
         packProperties.stream()
                 .flatMap(citIdentifier -> {
-                    try (InputStream is = resourcePack.getResource(PackType.CLIENT_RESOURCES, citIdentifier)) {
+                    try (InputStream is = resourcePack.getResource(PackType.CLIENT_RESOURCES, citIdentifier).get()) {
                         Properties citProperties = new Properties();
                         citProperties.load(new InputStreamReader(is, StandardCharsets.UTF_8));
 
@@ -100,7 +116,7 @@ public final class CITParser { private CITParser() {}
         if (citPack.cits.isEmpty())
             return Collections.emptySet();
         else {
-            CITResewn.info("Found " + citPack.cits.size() + " CIT" + (citPack.cits.size() == 1 ? "" : "s") + " in " + resourcePack.getName());
+            CITResewn.info("Found " + citPack.cits.size() + " CIT" + (citPack.cits.size() == 1 ? "" : "s") + " in " + resourcePack.packId());
             return Collections.singleton(citPack);
         }
     }

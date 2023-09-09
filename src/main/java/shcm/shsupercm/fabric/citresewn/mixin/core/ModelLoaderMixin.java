@@ -1,5 +1,6 @@
 package shcm.shsupercm.fabric.citresewn.mixin.core;
 
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,8 +25,6 @@ import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
 
 @Mixin(value = ModelBakery.class, priority = 999)
 public abstract class ModelLoaderMixin {
-    @Shadow @Final
-    protected ResourceManager resourceManager;
 
     @Inject(method = "loadTopLevel", at = @At("TAIL"))
     public void initCITs(ModelResourceLocation eventModelId, CallbackInfo ci) { if (eventModelId != ModelBakery.MISSING_MODEL_LOCATION) return;
@@ -39,7 +38,7 @@ public abstract class ModelLoaderMixin {
             return;
 
         info("Parsing CITs...");
-        List<CITPack> parsedPacks = CITParser.parseCITs(resourceManager.listPacks().collect(Collectors.toCollection(ArrayList::new)));
+        List<CITPack> parsedPacks = CITParser.parseCITs(Minecraft.getInstance().getResourceManager().listPacks().collect(Collectors.toCollection(ArrayList::new)));
         List<CIT> parsed = parsedPacks.stream().flatMap(pack -> pack.cits.stream()).collect(Collectors.toCollection(ArrayList::new));
 
         if (parsed.size() > 0) {

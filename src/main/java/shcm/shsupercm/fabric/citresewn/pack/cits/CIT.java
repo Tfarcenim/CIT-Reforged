@@ -1,9 +1,11 @@
 package shcm.shsupercm.fabric.citresewn.pack.cits;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,9 +54,9 @@ public abstract class CIT {
             for (String itemId : (properties.getProperty("items", properties.getProperty("matchItems", " "))).split(" "))
                 if (!itemId.isEmpty()) {
                     ResourceLocation itemIdentifier = new ResourceLocation(itemId);
-                    if (!Registry.ITEM.containsKey(itemIdentifier))
+                    if (!BuiltInRegistries.ITEM.containsKey(itemIdentifier))
                         throw new Exception("Unknown item " + itemId);
-                    this.items.add(Registry.ITEM.get(itemIdentifier));
+                    this.items.add(BuiltInRegistries.ITEM.get(itemIdentifier));
                 }
             if (this.items.isEmpty())
                 try {
@@ -62,8 +64,8 @@ public abstract class CIT {
                     String[] split = id.split("/");
                     id = split[split.length - 1];
                     ResourceLocation itemId = new ResourceLocation(propertiesIdentifier.getNamespace(), id);
-                    if (Registry.ITEM.containsKey(itemId))
-                        this.items.add(Registry.ITEM.get(itemId));
+                    if (BuiltInRegistries.ITEM.containsKey(itemId))
+                        this.items.add(BuiltInRegistries.ITEM.get(itemId));
                 } catch (Exception ignored) { }
 
             String damage = properties.getProperty("damage");
@@ -124,7 +126,7 @@ public abstract class CIT {
             if (!(this.enchantmentsAny = enchantmentIDs == null)) {
                 for (String ench : enchantmentIDs.split(" ")) {
                     ResourceLocation enchIdentifier = new ResourceLocation(ench);
-                    if (!Registry.ENCHANTMENT.containsKey(enchIdentifier))
+                    if (!BuiltInRegistries.ENCHANTMENT.containsKey(enchIdentifier))
                         CITResewn.logWarnLoading("CIT Warning: Unknown enchantment " + enchIdentifier);
                     this.enchantments.add(enchIdentifier);
                 }
@@ -338,7 +340,10 @@ public abstract class CIT {
      * It will first try using definedPath as an absolute path, if it cant resolve(or definedPath starts with ./), definedPath will be considered relative. <br>
      * Relative paths support going to parent directories using "..".
      */
-    public static ResourceLocation resolvePath(ResourceLocation propertyIdentifier, String path, String extension, Predicate<ResourceLocation> packContains) {
+    public static ResourceLocation resolvePath(ResourceLocation propertyIdentifier, String path, String extension, ResourceManager resourceManager ) {
+
+        Predicate<ResourceLocation> packContains = id -> resourceManager.getResource(id).isPresent();
+
         if (path == null) {
             path = propertyIdentifier.getPath().substring(0, propertyIdentifier.getPath().length() - 11);
             if (!path.endsWith(extension))
@@ -397,6 +402,8 @@ public abstract class CIT {
 
         return packContains.test(pathIdentifier) ? pathIdentifier : null;
     }
+
+
 
     /**
      * Author: Paul "prupe" Rupe<br>

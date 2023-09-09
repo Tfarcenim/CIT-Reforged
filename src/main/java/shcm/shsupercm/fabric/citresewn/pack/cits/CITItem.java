@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.apache.commons.io.IOUtils;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
 import shcm.shsupercm.fabric.citresewn.ex.CITLoadException;
@@ -52,6 +53,8 @@ public class CITItem extends CIT {
 
     public CITItem(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException {
         super(pack, identifier, properties);
+
+
         try {
             if (this.items.size() == 0)
                 throw new Exception("CIT must target at least one item type");
@@ -66,11 +69,11 @@ public class CITItem extends CIT {
                         break;
                     }
             if (!containsTexture) {
-                assetIdentifier = resolvePath(identifier, modelProp, ".json", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                assetIdentifier = resolvePath(identifier, modelProp, ".json",resourceManager);
                 if (assetIdentifier != null)
                     assetIdentifiers.put(null, assetIdentifier);
                 else if (modelProp != null) {
-                    assetIdentifier = resolvePath(identifier, modelProp, ".json", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                    assetIdentifier = resolvePath(identifier, modelProp, ".json", resourceManager);
                     if (assetIdentifier != null)
                         assetIdentifiers.put(null, assetIdentifier);
                 }
@@ -78,7 +81,7 @@ public class CITItem extends CIT {
 
             for (Object o : properties.keySet())
                 if (o instanceof String property && property.startsWith("model.")) {
-                    ResourceLocation subIdentifier = resolvePath(identifier, properties.getProperty(property), ".json", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                    ResourceLocation subIdentifier = resolvePath(identifier, properties.getProperty(property), ".json", resourceManager);
                     if (subIdentifier == null)
                         throw new Exception("Cannot resolve path for " + property);
 
@@ -92,13 +95,13 @@ public class CITItem extends CIT {
                 String textureProp = properties.getProperty("texture");
                 if (textureProp == null)
                     textureProp = properties.getProperty("tile");
-                assetIdentifier = resolvePath(identifier, textureProp, ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                assetIdentifier = resolvePath(identifier, textureProp, ".png", resourceManager);
                 if (assetIdentifier != null)
                     assetIdentifiers.put(null, assetIdentifier);
 
                 for (Object o : properties.keySet())
                     if (o instanceof String property && property.startsWith("texture.")) {
-                        ResourceLocation subIdentifier = resolvePath(identifier, properties.getProperty(property), ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                        ResourceLocation subIdentifier = resolvePath(identifier, properties.getProperty(property), ".png", resourceManager);
                         if (subIdentifier == null)
                             throw new Exception("Cannot resolve path for " + property);
 
@@ -111,7 +114,7 @@ public class CITItem extends CIT {
                 if (textureProp == null)
                     textureProp = properties.getProperty("tile");
                 if (textureProp != null) {
-                    assetIdentifier = resolvePath(identifier, textureProp, ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                    assetIdentifier = resolvePath(identifier, textureProp, ".png",resourceManager);
                     if (assetIdentifier != null)
                         textureOverrideMap.put(null, Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(assetIdentifier))));
                     else
@@ -121,7 +124,7 @@ public class CITItem extends CIT {
                 for (Object o : properties.keySet())
                     if (o instanceof String property && property.startsWith("texture.")) {
                         textureProp = properties.getProperty(property);
-                        ResourceLocation subIdentifier = resolvePath(identifier, textureProp, ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                        ResourceLocation subIdentifier = resolvePath(identifier, textureProp, ".png",resourceManager);
                         if (subIdentifier == null)
                             throw new Exception("Cannot resolve path for " + property);
 
@@ -172,7 +175,7 @@ public class CITItem extends CIT {
                 if (!assetIdentifiers.isEmpty()) { // contains sub models
                     LinkedHashMap<ResourceLocation, List<ItemOverride.Predicate>> overrideConditions = new LinkedHashMap<>();
                     for (Item item : this.items) {
-                        ResourceLocation itemIdentifier = Registry.ITEM.getKey(item);
+                        ResourceLocation itemIdentifier = BuiltInRegistries.ITEM.getKey(item);
                         overrideConditions.put(new ResourceLocation(itemIdentifier.getNamespace(), "item/" + itemIdentifier.getPath()), Collections.emptyList());
 
                         Resource itemModelResource = null;
@@ -223,7 +226,7 @@ public class CITItem extends CIT {
 
                         for (ResourceLocation overrideModel : overrideModels) {
                         	this.resourceManager = resourceManager;
-                            ResourceLocation replacement = resolvePath(baseIdentifier, overrideModel.toString(), ".json", this::containsResource);
+                            ResourceLocation replacement = resolvePath(baseIdentifier, overrideModel.toString(), ".json", resourceManager);
                             if (replacement != null) {
                                 String subTexturePath = replacement.toString().substring(0, replacement.toString().lastIndexOf('.'));
                                 final String subTextureName = subTexturePath.substring(subTexturePath.lastIndexOf('/') + 1);
@@ -255,7 +258,7 @@ public class CITItem extends CIT {
                 if (!assetIdentifiers.isEmpty()) { // contains sub models
                     LinkedHashMap<ResourceLocation, List<ItemOverride.Predicate>> overrideConditions = new LinkedHashMap<>();
                     for (Item item : this.items) {
-                        ResourceLocation itemIdentifier = Registry.ITEM.getKey(item);
+                        ResourceLocation itemIdentifier = BuiltInRegistries.ITEM.getKey(item);
                         overrideConditions.put(new ResourceLocation(itemIdentifier.getNamespace(), "item/" + itemIdentifier.getPath()), Collections.emptyList());
 
                         ResourceLocation itemModelIdentifier = new ResourceLocation(itemIdentifier.getNamespace(), "models/item/" + itemIdentifier.getPath() + ".json");
@@ -317,7 +320,7 @@ public class CITItem extends CIT {
                     Optional<Material> left = original.left();
                     if (left.isPresent()) {
                     	this.resourceManager = resourceManager;
-                        ResourceLocation resolvedIdentifier = resolvePath(identifier, left.get().texture().getPath(), ".png", this::containsResource);
+                        ResourceLocation resolvedIdentifier = resolvePath(identifier, left.get().texture().getPath(), ".png", resourceManager);
                         if (resolvedIdentifier != null)
                             return Either.left(new Material(left.get().atlasLocation(), new ResewnTextureIdentifier(resolvedIdentifier)));
                     }
@@ -352,7 +355,7 @@ public class CITItem extends CIT {
                 if (parentId != null) {
                     String[] parentIdPathSplit = parentId.getPath().split("/");
                     if (parentId.getPath().startsWith("./") || (parentIdPathSplit.length > 2 && parentIdPathSplit[1].equals("cit"))) {
-                        parentId = resolvePath(identifier, parentId.getPath(), ".json", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                        parentId = resolvePath(identifier, parentId.getPath(), ".json",resourceManager);
                         if (parentId != null)
                             ((JsonUnbakedModelAccessor) json).setParentLocation(new ResewnItemModelIdentifier(parentId));
                     }
@@ -361,7 +364,7 @@ public class CITItem extends CIT {
                 json.getOverrides().replaceAll(override -> {
                     String[] modelIdPathSplit = override.getModel().getPath().split("/");
                     if (override.getModel().getPath().startsWith("./") || (modelIdPathSplit.length > 2 && modelIdPathSplit[1].equals("cit"))) {
-                        ResourceLocation resolvedOverridePath = resolvePath(identifier, override.getModel().getPath(), ".json", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+                        ResourceLocation resolvedOverridePath = resolvePath(identifier, override.getModel().getPath(), ".json", resourceManager);
                         if (resolvedOverridePath != null)
                             return new ItemOverride(new ResewnItemModelIdentifier(resolvedOverridePath), override.getPredicates().collect(Collectors.toList()));
                     }
@@ -409,7 +412,7 @@ public class CITItem extends CIT {
         };
 
         if (replacement != null) {
-            CITResewn.logWarnLoading("CIT Warning: Using deprecated sub item id \"" + subItem + "\" instead of \"" + replacement + "\" in " + pack.resourcePack.getName() + " -> " + propertiesIdentifier.toString());
+            CITResewn.logWarnLoading("CIT Warning: Using deprecated sub item id \"" + subItem + "\" instead of \"" + replacement + "\" in " + pack.resourcePack.packId() + " -> " + propertiesIdentifier.toString());
 
             return new ResourceLocation("minecraft", "item/" + replacement);
         }
@@ -418,7 +421,7 @@ public class CITItem extends CIT {
     }
 
     private BlockModel getModelForFirstItemType(ResourceManager resourceManager) {
-        ResourceLocation firstItemIdentifier = Registry.ITEM.getKey(this.items.iterator().next()), firstItemModelIdentifier = new ResourceLocation(firstItemIdentifier.getNamespace(), "models/item/" + firstItemIdentifier.getPath() + ".json");
+        ResourceLocation firstItemIdentifier = BuiltInRegistries.ITEM.getKey(this.items.iterator().next()), firstItemModelIdentifier = new ResourceLocation(firstItemIdentifier.getNamespace(), "models/item/" + firstItemIdentifier.getPath() + ".json");
         Resource itemModelResource = null;
         try {
             BlockModel json = BlockModel.fromString(IOUtils.toString((itemModelResource = resourceManager.getResource(firstItemModelIdentifier).get()).open(), StandardCharsets.UTF_8));

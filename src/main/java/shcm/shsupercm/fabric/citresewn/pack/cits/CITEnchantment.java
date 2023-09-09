@@ -6,8 +6,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexMultiConsumer;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,6 +20,7 @@ import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
 import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
@@ -53,7 +53,7 @@ public class CITEnchantment extends CIT {
     public CITEnchantment(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException {
         super(pack, identifier, properties);
         try {
-            textureIdentifier = resolvePath(identifier, properties.getProperty("texture"), ".png", id -> pack.resourcePack.hasResource(PackType.CLIENT_RESOURCES, id));
+            textureIdentifier = resolvePath(identifier, properties.getProperty("texture"), ".png", Minecraft.getInstance().getResourceManager());
             if (textureIdentifier == null)
                 throw new Exception("Cannot resolve texture");
 
@@ -165,9 +165,9 @@ public class CITEnchantment extends CIT {
                         float l = Util.getMillis() * CITResewnConfig.INSTANCE().citenchantment_scroll_multiplier * speed;
                         float x = (l % 110000f) / 110000f;
                         float y = (l % 30000f) / 30000f;
-                        Matrix4f matrix4f = Matrix4f.createTranslateMatrix(-x, y, 0.0f);
-                        matrix4f.multiply(Vector3f.ZP.rotationDegrees(rotation + 10f));
-                        matrix4f.multiply(Matrix4f.createScaleMatrix(scale, scale, scale));
+                        Matrix4f matrix4f = new Matrix4f().translation(-x, y, 0.0f);
+                        matrix4f.rotate(Axis.ZP.rotationDegrees(rotation + 10f));
+                        matrix4f.mul(new Matrix4f().scale(scale, scale, scale));
                         setTextureMatrix(matrix4f);
 
                         setShaderColor(r, g, b, a * methodIntensity.intensity);

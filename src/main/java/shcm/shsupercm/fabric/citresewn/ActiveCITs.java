@@ -1,5 +1,6 @@
 package shcm.shsupercm.fabric.citresewn;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
 import shcm.shsupercm.fabric.citresewn.pack.CITPack;
 import shcm.shsupercm.fabric.citresewn.pack.cits.*;
@@ -51,7 +52,7 @@ public class ActiveCITs {
                     if (type instanceof ArmorItem armorType)
                         citArmor.computeIfAbsent(armorType, t -> new ArrayList<>()).add(armor);
                     else
-                        CITResewn.logErrorLoading("Ignoring item type: " + Registry.ITEM.getKey(type) + " is not armor in " + cit.pack.resourcePack.getName() + " -> " + cit.propertiesIdentifier.toString());
+                        CITResewn.logErrorLoading("Ignoring item type: " + BuiltInRegistries.ITEM.getKey(type) + " is not armor in " + cit.pack.resourcePack.packId() + " -> " + cit.propertiesIdentifier.toString());
             else if (cit instanceof CITElytra elytra)
                 citElytra.add(elytra);
             else if (cit instanceof CITEnchantment enchantment)

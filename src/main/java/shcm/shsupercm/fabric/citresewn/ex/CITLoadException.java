@@ -8,6 +8,6 @@ import net.minecraft.server.packs.PackResources;
  */
 public class CITLoadException extends Exception {
     public CITLoadException(PackResources resourcePack, ResourceLocation identifier, String message) {
-        super("Couldn't load CIT: " + message + " in " + resourcePack.getName() + " -> " + identifier.toString());
+        super("Couldn't load CIT: " + message + " in " + resourcePack.packId() + " -> " + identifier.toString());
     }
 }

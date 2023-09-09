@@ -37,7 +37,6 @@ public class ModelLoaderMixin {
     @Shadow @Final private Set<ResourceLocation> loadingStack;
     @Shadow @Final private Map<ResourceLocation, UnbakedModel> topLevelModels;
     @Shadow @Final private Map<ResourceLocation, UnbakedModel> unbakedCache;
-    @Shadow @Final private Map<ResourceLocation, BakedModel> bakedTopLevelModels;
 
     @Inject(method = "loadTopLevel", at = @At("TAIL"))//todo: is this correct
     public void addCITItemModels(ModelResourceLocation eventModelId, CallbackInfo ci) { if (eventModelId != ModelBakery.MISSING_MODEL_LOCATION) return;

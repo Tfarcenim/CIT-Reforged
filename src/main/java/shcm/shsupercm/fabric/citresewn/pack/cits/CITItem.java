@@ -55,9 +55,6 @@ public class CITItem extends CIT {
     public CITItem(CITPack pack, ResourceLocation identifier, Properties properties) throws CITParseException {
         super(pack, identifier, properties);
 
-        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-
-
         try {
             if (this.items.size() == 0)
                 throw new Exception("CIT must target at least one item type");
@@ -72,11 +69,11 @@ public class CITItem extends CIT {
                         break;
                     }
             if (!containsTexture) {
-                assetIdentifier = resolvePath(identifier, modelProp, ".json",resourceManager);
+                assetIdentifier = resolvePath1(identifier, modelProp, ".json",pack);
                 if (assetIdentifier != null)
                     assetIdentifiers.put(null, assetIdentifier);
                 else if (modelProp != null) {
-                    assetIdentifier = resolvePath(identifier, modelProp, ".json", resourceManager);
+                    assetIdentifier = resolvePath1(identifier, modelProp, ".json", pack);
                     if (assetIdentifier != null)
                         assetIdentifiers.put(null, assetIdentifier);
                 }
@@ -84,7 +81,7 @@ public class CITItem extends CIT {
 
             for (Object o : properties.keySet())
                 if (o instanceof String property && property.startsWith("model.")) {
-                    ResourceLocation subIdentifier = resolvePath(identifier, properties.getProperty(property), ".json", resourceManager);
+                    ResourceLocation subIdentifier = resolvePath1(identifier, properties.getProperty(property), ".json", pack);
                     if (subIdentifier == null)
                         throw new Exception("Cannot resolve path for " + property);
 
@@ -99,13 +96,13 @@ public class CITItem extends CIT {
                 String textureProp = properties.getProperty("texture");
                 if (textureProp == null)
                     textureProp = properties.getProperty("tile");
-                assetIdentifier = resolvePath(identifier, textureProp, ".png", resourceManager);
+                assetIdentifier = resolvePath1(identifier, textureProp, ".png", pack);
                 if (assetIdentifier != null)
                     assetIdentifiers.put(null, assetIdentifier);
 
                 for (Object o : properties.keySet())
                     if (o instanceof String property && property.startsWith("texture.")) {
-                        ResourceLocation subIdentifier = resolvePath(identifier, properties.getProperty(property), ".png", resourceManager);
+                        ResourceLocation subIdentifier = resolvePath1(identifier, properties.getProperty(property), ".png", pack);
                         if (subIdentifier == null)
                             throw new Exception("Cannot resolve path for " + property);
 
@@ -118,7 +115,7 @@ public class CITItem extends CIT {
                 if (textureProp == null)
                     textureProp = properties.getProperty("tile");
                 if (textureProp != null) {
-                    assetIdentifier = resolvePath(identifier, textureProp, ".png",resourceManager);
+                    assetIdentifier = resolvePath1(identifier, textureProp, ".png",pack);
                     if (assetIdentifier != null)
                         textureOverrideMap.put(null, Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(assetIdentifier))));
                     else
@@ -128,7 +125,7 @@ public class CITItem extends CIT {
                 for (Object o : properties.keySet())
                     if (o instanceof String property && property.startsWith("texture.")) {
                         textureProp = properties.getProperty(property);
-                        ResourceLocation subIdentifier = resolvePath(identifier, textureProp, ".png",resourceManager);
+                        ResourceLocation subIdentifier = resolvePath1(identifier, textureProp, ".png",pack);
                         if (subIdentifier == null)
                             throw new Exception("Cannot resolve path for " + property);
 
@@ -182,11 +179,10 @@ public class CITItem extends CIT {
                         ResourceLocation itemIdentifier = BuiltInRegistries.ITEM.getKey(item);
                         overrideConditions.put(new ResourceLocation(itemIdentifier.getNamespace(), "item/" + itemIdentifier.getPath()), Collections.emptyList());
 
-                        Resource itemModelResource = null;
                         ResourceLocation itemModelIdentifier = new ResourceLocation(itemIdentifier.getNamespace(), "models/item/" + itemIdentifier.getPath() + ".json");
                         try {
-                        	itemModelResource = resourceManager.getResource(itemModelIdentifier).get();
-                        	Reader resourceReader = new InputStreamReader(itemModelResource.open());
+                            Resource itemModelResource = resourceManager.getResource(itemModelIdentifier).get();
+                            Reader resourceReader = new InputStreamReader(itemModelResource.open());
                             BlockModel itemModelJson = BlockModel.fromStream(resourceReader);
 
                             if (itemModelJson.getOverrides() != null && !itemModelJson.getOverrides().isEmpty())

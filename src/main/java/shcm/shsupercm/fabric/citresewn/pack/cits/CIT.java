@@ -1,10 +1,10 @@
 package shcm.shsupercm.fabric.citresewn.pack.cits;
 
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
@@ -343,6 +343,69 @@ public abstract class CIT {
     public static ResourceLocation resolvePath(ResourceLocation propertyIdentifier, String path, String extension, ResourceManager resourceManager ) {
 
         Predicate<ResourceLocation> packContains = id -> resourceManager.getResource(id).isPresent();
+
+        if (path == null) {
+            path = propertyIdentifier.getPath().substring(0, propertyIdentifier.getPath().length() - 11);
+            if (!path.endsWith(extension))
+                path = path + extension;
+            ResourceLocation pathIdentifier = new ResourceLocation(propertyIdentifier.getNamespace(), path);
+            return packContains.test(pathIdentifier) ? pathIdentifier : null;
+        }
+
+        ResourceLocation pathIdentifier = new ResourceLocation(path);
+
+        path = pathIdentifier.getPath().replace('\\', '/');
+        if (!path.endsWith(extension))
+            path = path + extension;
+
+        if (path.startsWith("./"))
+            path = path.substring(2);
+        else if (!path.contains("..")) {
+            pathIdentifier = new ResourceLocation(pathIdentifier.getNamespace(), path);
+            if (packContains.test(pathIdentifier))
+                return pathIdentifier;
+            else if (path.startsWith("assets/")) {
+                path = path.substring(7);
+                int sep = path.indexOf('/');
+                pathIdentifier = new ResourceLocation(path.substring(0, sep), path.substring(sep + 1));
+                if (packContains.test(pathIdentifier))
+                    return pathIdentifier;
+            }
+            pathIdentifier = new ResourceLocation(pathIdentifier.getNamespace(), switch (extension) {
+                case ".png" -> "textures/";
+                case ".json" -> "models/";
+
+                /* UNREACHABLE FAILSAFE */
+                default -> "";
+            } + path);
+            if (packContains.test(pathIdentifier))
+                return pathIdentifier;
+        }
+
+        LinkedList<String> pathParts = new LinkedList<>(Arrays.asList(propertyIdentifier.getPath().split("/")));
+        pathParts.removeLast();
+
+        if (path.contains("/")) {
+            for (String part : path.split("/")) {
+                if (part.equals("..")) {
+                    if (pathParts.size() == 0)
+                        return null;
+                    pathParts.removeLast();
+                } else
+                    pathParts.addLast(part);
+            }
+        } else
+            pathParts.addLast(path);
+        path = String.join("/", pathParts);
+
+        pathIdentifier = new ResourceLocation(propertyIdentifier.getNamespace(), path);
+
+        return packContains.test(pathIdentifier) ? pathIdentifier : null;
+    }
+
+    public static ResourceLocation resolvePath1(ResourceLocation propertyIdentifier, String path, String extension,CITPack citPack) {
+
+        Predicate<ResourceLocation> packContains = id -> citPack.resourcePack.getResource(PackType.CLIENT_RESOURCES,id) != null;
 
         if (path == null) {
             path = propertyIdentifier.getPath().substring(0, propertyIdentifier.getPath().length() - 11);

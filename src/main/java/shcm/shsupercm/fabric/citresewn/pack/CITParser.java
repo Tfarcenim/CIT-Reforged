@@ -62,7 +62,11 @@ public final class CITParser { private CITParser() {}
 
 
                         List<ResourceLocation> locations = new ArrayList<>();
-                        resourcePack.listResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", (resourceLocation, inputStreamIoSupplier) -> locations.add(resourceLocation));
+                        resourcePack.listResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", (resourceLocation, inputStreamIoSupplier) -> {
+                            if (resourceLocation.getPath().endsWith(".properties")) {
+                                locations.add(resourceLocation);
+                            }
+                        });
                         packProperties.addAll(locations);
                         //     packProperties.addAll(resourcePack.getResources(PackType.CLIENT_RESOURCES, namespace, citRoot + "/cit", s -> s.getPath().endsWith(".properties")));
                         ResourceLocation global = new ResourceLocation(namespace, citRoot + "/cit.properties");

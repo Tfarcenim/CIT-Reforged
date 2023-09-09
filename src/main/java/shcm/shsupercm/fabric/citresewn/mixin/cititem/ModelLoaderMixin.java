@@ -2,7 +2,13 @@ package shcm.shsupercm.fabric.citresewn.mixin.cititem;
 
 import com.mojang.datafixers.util.Either;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.block.model.ItemOverride;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.*;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.commons.io.IOUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import shcm.shsupercm.CITHooks;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
 import shcm.shsupercm.fabric.citresewn.pack.ResewnItemModelIdentifier;
 import shcm.shsupercm.fabric.citresewn.pack.ResewnTextureIdentifier;
@@ -22,24 +29,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemOverride;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 
 import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
 
 @Mixin(ModelBakery.class)
 public class ModelLoaderMixin {
-    protected ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
     @Shadow @Final private Set<ResourceLocation> loadingStack;
     @Shadow @Final private Map<ResourceLocation, UnbakedModel> topLevelModels;
     @Shadow @Final private Map<ResourceLocation, UnbakedModel> unbakedCache;
@@ -56,7 +50,7 @@ public class ModelLoaderMixin {
                 .distinct()
                 .forEach(citItem -> {
                     try {
-                        citItem.loadUnbakedAssets(resourceManager);
+                        citItem.loadUnbakedAssets(Minecraft.getInstance().getResourceManager());
 
                         for (BlockModel unbakedModel : citItem.unbakedAssets.values()) {
                             ResewnItemModelIdentifier id = new ResewnItemModelIdentifier(unbakedModel.name);
@@ -74,31 +68,7 @@ public class ModelLoaderMixin {
 
     @Inject(method = "bakeModels", at = @At("RETURN"))
     public void linkBakedCITItemModels(BiFunction<ResourceLocation, Material, TextureAtlasSprite> map, CallbackInfo ci) {
-        if (CITResewn.INSTANCE.activeCITs == null)
-            return;
-
-   //     profiler.push("citresewn_linking");
-        info("Linking baked models to CITItems...");
-
-        if (CITResewn.INSTANCE.activeCITs != null) {
-            for (CITItem citItem : CITResewn.INSTANCE.activeCITs.citItems.values().stream().flatMap(Collection::stream).distinct().collect(Collectors.toList())) {
-                for (Map.Entry<List<ItemOverride.Predicate>, BlockModel> citModelEntry : citItem.unbakedAssets.entrySet()) {
-                    if (citModelEntry.getKey() == null) {
-                        citItem.bakedModel = this.bakedTopLevelModels.get(new ResewnItemModelIdentifier(citModelEntry.getValue().name));
-                    } else {
-                        BakedModel bakedModel = bakedTopLevelModels.get(new ResewnItemModelIdentifier(citModelEntry.getValue().name));
-
-                        if (bakedModel == null)
-                            CITResewn.logWarnLoading("Skipping sub cit: Failed loading model for \"" + citModelEntry.getValue().name + "\" in " + citItem.pack.resourcePack.packId() + " -> " + citItem.propertiesIdentifier.getPath());
-                        else
-                            citItem.bakedSubModels.override(citModelEntry.getKey(), bakedModel);
-                    }
-                }
-                citItem.unbakedAssets = null;
-            }
-        }
-
-     //   profiler.pop();
+        CITHooks.linkBakedCITItemModels((ModelBakery) (Object)this);
     }
 
 
@@ -108,6 +78,7 @@ public class ModelLoaderMixin {
             InputStream is = null;
             Resource resource = null;
             try {
+                ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
                 BlockModel json = BlockModel.fromString(IOUtils.toString(is = (resource = resourceManager.getResource(id).get()).open(), StandardCharsets.UTF_8));
                 json.name = id.toString();
                 json.name = json.name.substring(0, json.name.length() - 5);

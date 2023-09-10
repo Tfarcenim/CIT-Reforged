@@ -19,7 +19,7 @@ public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends Humanoi
     @Inject(method = "renderArmorPiece", at = @At("HEAD"))
     private void setAppliedContextAndStartApplyingArmor(PoseStack matrices, MultiBufferSource vertexConsumers, T livingEntity, EquipmentSlot armorSlot, int light, A model, CallbackInfo ci) {
         if (CITResewnConfig.INSTANCE().enabled && CITResewn.INSTANCE.activeCITs != null) {
-            CITResewn.INSTANCE.activeCITs.setEnchantmentAppliedContextCached(livingEntity.getItemBySlot(armorSlot), livingEntity.level, livingEntity);
+            CITResewn.INSTANCE.activeCITs.setEnchantmentAppliedContextCached(livingEntity.getItemBySlot(armorSlot), livingEntity.level(), livingEntity);
             CITEnchantment.shouldApply = true;
         }
     }

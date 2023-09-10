@@ -64,12 +64,6 @@ public class CITHooks {
         //     profiler.push("citresewn_linking");
         info("Linking baked models to CITItems...");
 
-        for (Map.Entry<ResourceLocation,BakedModel> entry : bakery.getBakedTopLevelModels().entrySet()) {
-            if (entry.getKey().getPath().contains("optifine")) {
-                System.out.println(entry.getValue().getParticleIcon());
-            }
-        }
-
         List<CITItem> citItems = CITResewn.INSTANCE.activeCITs.citItems.values().stream().flatMap(Collection::stream).distinct().toList();
         for (CITItem citItem : citItems) {
             for (Map.Entry<List<ItemOverride.Predicate>, BlockModel> citModelEntry : citItem.unbakedAssets.entrySet()) {

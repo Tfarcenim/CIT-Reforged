@@ -1,6 +1,7 @@
 package shcm.shsupercm.fabric.citresewn.pack;
 
 import net.minecraft.resources.ResourceLocation;
+import shcm.shsupercm.fabric.citresewn.mixin.cititem.ModelLoaderMixin;
 
 /**
  * Marks models as cit item models.

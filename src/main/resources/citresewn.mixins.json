@@ -3,7 +3,6 @@
   "minVersion": "0.8",
   "package": "shcm.shsupercm.fabric.citresewn.mixin",
   "compatibilityLevel": "JAVA_16",
-  "plugin": "shcm.shsupercm.fabric.citresewn.config.CITResewnMixinConfiguration",
   "mixins": [
     "citarmor.ArmorFeatureRendererMixin",
     "citarmor.ItemStackMixin",
@@ -28,7 +27,6 @@
   },
   "client": [
     "AtlasPreparationMixin",
-    "ModelManagerMixin",
     "SpriteResourceLoaderMixin"
   ]
 }

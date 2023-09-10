@@ -30,7 +30,7 @@ public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends Humanoi
 
         ItemStack itemStack = entity.getItemBySlot(armorSlot);
 
-        Map<String, ResourceLocation> armorTextures = CITResewn.INSTANCE.activeCITs.getArmorTexturesCached(itemStack, entity.level, entity);
+        Map<String, ResourceLocation> armorTextures = CITResewn.INSTANCE.activeCITs.getArmorTexturesCached(itemStack, entity.level(), entity);
         if (armorTextures != null) {
             armorTexturesCached = new WeakReference<>(armorTextures);
             return;

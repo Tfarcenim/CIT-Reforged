@@ -14,18 +14,21 @@
     "citenchantment.ElytraFeatureRendererMixin",
     "citenchantment.ItemRendererMixin",
     "citenchantment.ItemStackMixin",
-    "citenchantment.RenderPhaseAccessor",
     "citenchantment.MinecraftClientMixin",
+    "citenchantment.RenderPhaseAccessor",
     "cititem.ItemRendererMixin",
     "cititem.ItemStackMixin",
     "cititem.JsonUnbakedModelAccessor",
     "cititem.ModelLoaderMixin",
-    "core.ModelLoaderMixin",
     "core.NbtCompoundAccessor",
     "core.SpriteAtlasTextureMixin"
-    //"core.ZipResourcePackMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "AtlasPreparationMixin",
+    "ModelManagerMixin",
+    "SpriteResourceLoaderMixin"
+  ]
 }

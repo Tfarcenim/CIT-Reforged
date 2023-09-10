@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import org.apache.commons.io.IOUtils;
 import shcm.shsupercm.fabric.citresewn.CITResewn;
@@ -13,7 +12,6 @@ import shcm.shsupercm.fabric.citresewn.ex.CITParseException;
 import shcm.shsupercm.fabric.citresewn.mixin.cititem.JsonUnbakedModelAccessor;
 import shcm.shsupercm.fabric.citresewn.pack.CITPack;
 import shcm.shsupercm.fabric.citresewn.pack.ResewnItemModelIdentifier;
-import shcm.shsupercm.fabric.citresewn.pack.ResewnTextureIdentifier;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,9 +28,7 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.LivingEntity;
@@ -117,7 +113,7 @@ public class CITItem extends CIT {
                 if (textureProp != null) {
                     assetIdentifier = resolvePath1(identifier, textureProp, ".png",pack);
                     if (assetIdentifier != null)
-                        textureOverrideMap.put(null, Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(assetIdentifier))));
+                        textureOverrideMap.put(null, Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnItemModelIdentifier(assetIdentifier))));
                     else
                         throw new Exception("Cannot resolve path for texture");
                 }
@@ -129,7 +125,7 @@ public class CITItem extends CIT {
                         if (subIdentifier == null)
                             throw new Exception("Cannot resolve path for " + property);
 
-                        textureOverrideMap.put(property.substring(8), Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(subIdentifier))));
+                        textureOverrideMap.put(property.substring(8), Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnItemModelIdentifier(subIdentifier))));
                     }
             }
 
@@ -156,9 +152,9 @@ public class CITItem extends CIT {
                     textureOverrideMap.replaceAll((layerName, originalTextureEither) -> {
                         ResourceLocation textureIdentifier = assetIdentifiers.remove(originalTextureEither.map(Material::texture, ResourceLocation::new));
                         if (textureIdentifier != null)
-                            return Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(textureIdentifier)));
+                            return Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnItemModelIdentifier(textureIdentifier)));
                         if (defaultAsset != null)
-                            return Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(defaultAsset)));
+                            return Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnItemModelIdentifier(defaultAsset)));
                         return null;
                     });
 
@@ -310,9 +306,8 @@ public class CITItem extends CIT {
         BlockModel json;
         if (identifier.getPath().endsWith(".json")) {
             InputStream is = null;
-            Resource resource = null;
             try {
-                json = BlockModel.fromString(IOUtils.toString(is = (resource = resourceManager.getResource(identifier).get()).open(), StandardCharsets.UTF_8));
+                json = BlockModel.fromString(IOUtils.toString(is = resourceManager.getResource(identifier).get().open(), StandardCharsets.UTF_8));
                 json.name = assetIdentifier.toString();
                 json.name = json.name.substring(0, json.name.length() - 5);
 
@@ -322,7 +317,7 @@ public class CITItem extends CIT {
                     	this.resourceManager = resourceManager;
                         ResourceLocation resolvedIdentifier = resolvePath(identifier, left.get().texture().getPath(), ".png", resourceManager);
                         if (resolvedIdentifier != null)
-                            return Either.left(new Material(left.get().atlasLocation(), new ResewnTextureIdentifier(resolvedIdentifier)));
+                            return Either.left(new Material(left.get().atlasLocation(), new ResewnItemModelIdentifier(resolvedIdentifier)));
                     }
                     return original;
                 });
@@ -379,7 +374,7 @@ public class CITItem extends CIT {
         } else if (identifier.getPath().endsWith(".png")) {
             json = getModelForFirstItemType(resourceManager);
             if (json == null)
-                json = new BlockModel(new ResourceLocation("minecraft", "item/generated"), new ArrayList<>(), ImmutableMap.of("layer0", Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(identifier)))), true, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
+                json = new BlockModel(new ResourceLocation("minecraft", "item/generated"), new ArrayList<>(), ImmutableMap.of("layer0", Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnItemModelIdentifier(identifier)))), true, BlockModel.GuiLight.FRONT, ItemTransforms.NO_TRANSFORMS, new ArrayList<>());
             json.getOverrides().clear();
             json.name = identifier.toString();
             json.name = json.name.substring(0, json.name.length() - 4);
@@ -391,7 +386,7 @@ public class CITItem extends CIT {
                         textureOverride = textureOverrideMap.get(null);
                     return textureOverride == null ? originalTextureEither : textureOverride;
                 } else
-                    return Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, new ResewnTextureIdentifier(identifier)));
+                    return Either.left(new Material(TextureAtlas.LOCATION_BLOCKS, identifier));
             });
             return json;
         }

@@ -42,7 +42,7 @@ minecraft {
 	runs {
 		client {
 			workingDirectory project.file('run')
-			arg "-mixin.config="+archivesBaseName+".mixins.json"
+			arg "-mixin.config="+modid+".mixins.json"
 
 
 			// Recommended logging level for the console
@@ -62,7 +62,7 @@ minecraft {
 
 		server {
 			workingDirectory project.file('run')
-			arg "-mixin.config="+archivesBaseName+".mixins.json"
+			arg "-mixin.config="+modid+".mixins.json"
 
 
 			// Recommended logging level for the console

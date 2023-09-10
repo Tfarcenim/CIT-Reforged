@@ -6,13 +6,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import shcm.shsupercm.fabric.citresewn.pack.ResewnTextureIdentifier;
+import shcm.shsupercm.fabric.citresewn.pack.ResewnItemModelIdentifier;
 
 @Mixin(TextureAtlas.class)
 public class SpriteAtlasTextureMixin {
     @Inject(method = "getSprite", cancellable = true, at = @At("HEAD"))
     public void forceLiteralResewnTextureIdentifier(ResourceLocation id, CallbackInfoReturnable<ResourceLocation> cir) {
-        if (id instanceof ResewnTextureIdentifier)
+        if (id instanceof ResewnItemModelIdentifier)
             cir.setReturnValue(id);
     }
 }

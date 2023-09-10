@@ -19,7 +19,6 @@ import shcm.shsupercm.fabric.citresewn.mixin.cititem.JsonUnbakedModelAccessor;
 import shcm.shsupercm.fabric.citresewn.pack.CITPack;
 import shcm.shsupercm.fabric.citresewn.pack.CITParser;
 import shcm.shsupercm.fabric.citresewn.pack.ResewnItemModelIdentifier;
-import shcm.shsupercm.fabric.citresewn.pack.ResewnTextureIdentifier;
 import shcm.shsupercm.fabric.citresewn.pack.cits.CIT;
 import shcm.shsupercm.fabric.citresewn.pack.cits.CITItem;
 
@@ -32,6 +31,7 @@ import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
 
 public class CITHooks {
 
+
     public static void initCITS(ResourceLocation eventId) {
         if (eventId != ModelBakery.MISSING_MODEL_LOCATION) return;
         if (CITResewn.INSTANCE.activeCITs != null) {
@@ -43,8 +43,11 @@ public class CITHooks {
         if (!CITResewnConfig.INSTANCE().enabled)
             return;
 
+        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+
+
         info("Parsing CITs...");
-        List<CITPack> parsedPacks = CITParser.parseCITs(Minecraft.getInstance().getResourceManager().listPacks().collect(Collectors.toCollection(ArrayList::new)));
+        List<CITPack> parsedPacks = CITParser.parseCITs(resourceManager.listPacks().collect(Collectors.toCollection(ArrayList::new)));
         List<CIT> parsed = parsedPacks.stream().flatMap(pack -> pack.cits.stream()).collect(Collectors.toCollection(ArrayList::new));
 
         if (parsed.size() > 0) {
@@ -104,7 +107,7 @@ public class CITHooks {
                     if (originalPath.startsWith("./") || (split.length > 2 && split[1].equals("cit"))) {
                         ResourceLocation resolvedIdentifier = CIT.resolvePath(identifier, originalPath, ".png",  resourceManager);
                         if (resolvedIdentifier != null)
-                            return Either.left(new Material(left.get().atlasLocation(), new ResewnTextureIdentifier(resolvedIdentifier)));
+                            return Either.left(new Material(left.get().atlasLocation(), new ResewnItemModelIdentifier(resolvedIdentifier)));
                     }
                 }
                 return original;
@@ -140,7 +143,10 @@ public class CITHooks {
     }
 
     public static void addCITItemModels(ModelBakery bakery, ResourceLocation eventModelId, Map<ResourceLocation, UnbakedModel> unbakedCache, Set<ResourceLocation> loadingStack, Map<ResourceLocation, UnbakedModel> topLevelModels) {
-        if (eventModelId != ModelBakery.MISSING_MODEL_LOCATION) return;
+        if (eventModelId != ModelBakery.MISSING_MODEL_LOCATION)return;
+
+        CITHooks.initCITS(eventModelId);
+
         if (CITResewn.INSTANCE.activeCITs == null)
             return;
 
@@ -156,13 +162,14 @@ public class CITHooks {
                         for (BlockModel unbakedModel : citItem.unbakedAssets.values()) {
                             ResewnItemModelIdentifier id = new ResewnItemModelIdentifier(unbakedModel.name);
                             unbakedCache.put(id, unbakedModel);
-                          //  loadingStack.addAll(unbakedModel.getDependencies());
+                            loadingStack.addAll(unbakedModel.getDependencies());
                             topLevelModels.put(id, unbakedModel);
                         }
                     } catch (Exception e) {
                         CITResewn.logErrorLoading(e.getMessage());
                     }
                 });
+
 
         CITItem.GENERATED_SUB_CITS_SEEN.clear();
     }

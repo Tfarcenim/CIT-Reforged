@@ -31,6 +31,8 @@ public final class CITParser { private CITParser() {}
         REGISTRY.put("enchantment", CITEnchantment::new);
     }
 
+    public static final String[] ROOTS = new String[] { "citresewn", "optifine", "mcpatcher" };
+
     /**
      * Parses cit entries from an ordered collection of resourcepacks.
      * @param packs packs to parse
@@ -58,7 +60,7 @@ public final class CITParser { private CITParser() {}
         Collection<ResourceLocation> packProperties = new ArrayList<>();
         for (String namespace : resourcePack.getNamespaces(PackType.CLIENT_RESOURCES))
             if (ResourceLocation.isValidResourceLocation(namespace))
-                for (String citRoot : new String[] { "citresewn", "optifine", "mcpatcher" }) {
+                for (String citRoot : ROOTS) {
 
 
                         List<ResourceLocation> locations = new ArrayList<>();

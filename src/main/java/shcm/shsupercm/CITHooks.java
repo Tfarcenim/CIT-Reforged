@@ -12,22 +12,22 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.commons.io.IOUtils;
-import shcm.shsupercm.fabric.citresewn.ActiveCITs;
-import shcm.shsupercm.fabric.citresewn.CITResewn;
-import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
-import shcm.shsupercm.fabric.citresewn.mixin.cititem.JsonUnbakedModelAccessor;
-import shcm.shsupercm.fabric.citresewn.pack.CITPack;
-import shcm.shsupercm.fabric.citresewn.pack.CITParser;
-import shcm.shsupercm.fabric.citresewn.pack.ResewnItemModelIdentifier;
-import shcm.shsupercm.fabric.citresewn.pack.cits.CIT;
-import shcm.shsupercm.fabric.citresewn.pack.cits.CITItem;
+import shcm.shsupercm.forge.citresewn.ActiveCITs;
+import shcm.shsupercm.forge.citresewn.CITResewn;
+import shcm.shsupercm.forge.citresewn.config.CITResewnConfig;
+import shcm.shsupercm.forge.citresewn.mixin.cititem.JsonUnbakedModelAccessor;
+import shcm.shsupercm.forge.citresewn.pack.CITPack;
+import shcm.shsupercm.forge.citresewn.pack.CITParser;
+import shcm.shsupercm.forge.citresewn.pack.ResewnItemModelIdentifier;
+import shcm.shsupercm.forge.citresewn.pack.cits.CIT;
+import shcm.shsupercm.forge.citresewn.pack.cits.CITItem;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
+import static shcm.shsupercm.forge.citresewn.CITResewn.info;
 
 public class CITHooks {
 

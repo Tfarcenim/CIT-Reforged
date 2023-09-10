@@ -181,7 +181,7 @@ public class CITItem extends CIT {
                             Reader resourceReader = new InputStreamReader(itemModelResource.open());
                             BlockModel itemModelJson = BlockModel.fromStream(resourceReader);
 
-                            if (itemModelJson.getOverrides() != null && !itemModelJson.getOverrides().isEmpty())
+                            if (!itemModelJson.getOverrides().isEmpty())
                                 for (ItemOverride override : itemModelJson.getOverrides())
                                     overrideConditions.put(override.getModel(), override.getPredicates().toList());
                         }finally {
@@ -263,7 +263,7 @@ public class CITItem extends CIT {
                             Reader resourceReader = new InputStreamReader(itemModelResource.open());
                             BlockModel itemModelJson = BlockModel.fromStream(resourceReader);
 
-                            if (itemModelJson.getOverrides() != null && !itemModelJson.getOverrides().isEmpty())
+                            if (!itemModelJson.getOverrides().isEmpty())
                                 for (ItemOverride override : itemModelJson.getOverrides())
                                     overrideConditions.put(override.getModel(), override.getPredicates().toList());
                         }finally{
@@ -346,7 +346,7 @@ public class CITItem extends CIT {
                     jsonTextureMap.values().removeIf(Objects::isNull);
                 }
 
-                ResourceLocation parentId = ((JsonUnbakedModelAccessor) json).getParentLocation();
+                ResourceLocation parentId = json.getParentLocation();
                 if (parentId != null) {
                     String[] parentIdPathSplit = parentId.getPath().split("/");
                     if (parentId.getPath().startsWith("./") || (parentIdPathSplit.length > 2 && parentIdPathSplit[1].equals("cit"))) {

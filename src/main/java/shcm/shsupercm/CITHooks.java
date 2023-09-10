@@ -107,7 +107,7 @@ public class CITHooks {
                 return original;
             });
 
-            ResourceLocation parentId = ((JsonUnbakedModelAccessor) json).getParentLocation();
+            ResourceLocation parentId = json.getParentLocation();
             if (parentId != null) {
                 String[] parentIdPathSplit = parentId.getPath().split("/");
                 if (parentId.getPath().startsWith("./") || (parentIdPathSplit.length > 2 && parentIdPathSplit[1].equals("cit"))) {
@@ -163,8 +163,6 @@ public class CITHooks {
                         CITResewn.logErrorLoading(e.getMessage());
                     }
                 });
-
-
         CITItem.GENERATED_SUB_CITS_SEEN.clear();
     }
 }

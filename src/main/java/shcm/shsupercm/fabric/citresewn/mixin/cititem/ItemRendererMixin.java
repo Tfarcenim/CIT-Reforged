@@ -51,9 +51,9 @@ public class ItemRendererMixin {
                 mojankCITModel = new WeakReference<>(model);
             else { // rendered in hand model of trident/spyglass
                 if (stack.is(Items.TRIDENT))
-                    mojankCITModel = new WeakReference<>(this.itemModelShaper.getModelManager().getModel(ModelResourceLocation.vanilla("trident","inventory")));
+                    mojankCITModel = new WeakReference<>(this.itemModelShaper.getModelManager().getModel(ModelResourceLocation.vanilla("trident_in_hand","inventory")));
                 else if (stack.is(Items.SPYGLASS))
-                    mojankCITModel = new WeakReference<>(this.itemModelShaper.getModelManager().getModel(ModelResourceLocation.vanilla("spyglass","inventory")));
+                    mojankCITModel = new WeakReference<>(this.itemModelShaper.getModelManager().getModel(ModelResourceLocation.vanilla("spyglass_in_hand","inventory")));
             }
         } else
             mojankCITModel = null;

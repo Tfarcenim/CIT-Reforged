@@ -44,13 +44,4 @@ public class ModelLoaderMixin {
             cir.setReturnValue(CITHooks.forceLiteralResewnModelIdentifier((ResewnItemModelIdentifier) id));
         }
     }
-
-    /*@ModifyArg(method = "loadModelFromJson", at =
-    @At(value = "INVOKE", target = "Lnet/minecraft/resource/ResourceManager;getResource(Lnet/minecraft/util/Identifier;)Lnet/minecraft/resource/Resource;"))
-    public Identifier fixDuplicatePrefixSuffix(Identifier original) {
-        if (original.getPath().startsWith("models/models/") && original.getPath().endsWith(".json.json") && original.getPath().contains("cit"))
-            return new Identifier(original.getNamespace(), original.getPath().substring(7, original.getPath().length() - 5));
-
-        return original;
-    }*/
 }

@@ -13,8 +13,6 @@
     "citenchantment.ElytraFeatureRendererMixin",
     "citenchantment.ItemRendererMixin",
     "citenchantment.ItemStackMixin",
-    "citenchantment.MinecraftClientMixin",
-    "citenchantment.RenderPhaseAccessor",
     "cititem.ItemRendererMixin",
     "cititem.ItemStackMixin",
     "cititem.JsonUnbakedModelAccessor",

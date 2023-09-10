@@ -146,8 +146,8 @@ public class CITItem extends CIT {
         try {
             if (isTexture) {
                 BlockModel itemJson = getModelForFirstItemType(resourceManager);
-                if (((JsonUnbakedModelAccessor) itemJson).getTextureMap().size() > 1) { // use(some/all of) the asset identifiers to build texture override in layered models
-                    textureOverrideMap = ((JsonUnbakedModelAccessor) itemJson).getTextureMap();
+                if (itemJson.textureMap.size() > 1) { // use(some/all of) the asset identifiers to build texture override in layered models
+                    textureOverrideMap = itemJson.textureMap;
                     ResourceLocation defaultAsset = assetIdentifiers.get(null);
                     textureOverrideMap.replaceAll((layerName, originalTextureEither) -> {
                         ResourceLocation textureIdentifier = assetIdentifiers.remove(originalTextureEither.map(Material::texture, ResourceLocation::new));
@@ -235,7 +235,7 @@ public class CITItem extends CIT {
                                 BlockModel jsonModel = loadUnbakedAsset(resourceManager, replacement);
                                 jsonModel.getOverrides().clear();
 
-                                ((JsonUnbakedModelAccessor) jsonModel).getTextureMap().replaceAll((layerName, texture) -> {
+                                jsonModel.textureMap.replaceAll((layerName, texture) -> {
                                     if (layerName != null)
                                         try {
                                             for (String subTexture : textureOverrideMap.keySet())
@@ -311,7 +311,7 @@ public class CITItem extends CIT {
                 json.name = assetIdentifier.toString();
                 json.name = json.name.substring(0, json.name.length() - 5);
 
-                ((JsonUnbakedModelAccessor) json).getTextureMap().replaceAll((layer, original) -> {
+                json.textureMap.replaceAll((layer, original) -> {
                     Optional<Material> left = original.left();
                     if (left.isPresent()) {
                     	this.resourceManager = resourceManager;
@@ -323,7 +323,7 @@ public class CITItem extends CIT {
                 });
 
                 if (textureOverrideMap.size() > 0) {
-                    Map<String, Either<Material, String>> jsonTextureMap = ((JsonUnbakedModelAccessor) json).getTextureMap();
+                    Map<String, Either<Material, String>> jsonTextureMap = json.textureMap;
                     if (jsonTextureMap.size() == 0)
                         jsonTextureMap.put("layer0", null);
 
@@ -379,7 +379,7 @@ public class CITItem extends CIT {
             json.name = identifier.toString();
             json.name = json.name.substring(0, json.name.length() - 4);
 
-            ((JsonUnbakedModelAccessor) json).getTextureMap().replaceAll((layerName, originalTextureEither) -> {
+            json.textureMap.replaceAll((layerName, originalTextureEither) -> {
                 if (textureOverrideMap.size() > 0) {
                     Either<Material, String> textureOverride = textureOverrideMap.get(layerName);
                     if (textureOverride == null)
@@ -417,9 +417,8 @@ public class CITItem extends CIT {
 
     private BlockModel getModelForFirstItemType(ResourceManager resourceManager) {
         ResourceLocation firstItemIdentifier = BuiltInRegistries.ITEM.getKey(this.items.iterator().next()), firstItemModelIdentifier = new ResourceLocation(firstItemIdentifier.getNamespace(), "models/item/" + firstItemIdentifier.getPath() + ".json");
-        Resource itemModelResource = null;
         try {
-            BlockModel json = BlockModel.fromString(IOUtils.toString((itemModelResource = resourceManager.getResource(firstItemModelIdentifier).get()).open(), StandardCharsets.UTF_8));
+            BlockModel json = BlockModel.fromString(IOUtils.toString(resourceManager.getResource(firstItemModelIdentifier).get().open(), StandardCharsets.UTF_8));
 
             if (!GENERATED_SUB_CITS_SEEN.add(firstItemModelIdentifier)) // cit generated duplicate
                 firstItemModelIdentifier = new ResourceLocation(firstItemModelIdentifier.getNamespace(), GENERATED_SUB_CITS_PREFIX + GENERATED_SUB_CITS_SEEN.size() + "_" + firstItemModelIdentifier.getPath());

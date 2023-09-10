@@ -3,7 +3,6 @@ package shcm.shsupercm.forge.citresewn;
 import net.minecraft.core.registries.BuiltInRegistries;
 import shcm.shsupercm.forge.citresewn.config.CITResewnConfig;
 import shcm.shsupercm.forge.citresewn.pack.CITPack;
-import shcm.shsupercm.fabric.citresewn.pack.cits.*;
 
 import java.util.*;
 import java.util.function.Supplier;

@@ -3,7 +3,6 @@ package shcm.shsupercm.forge.citresewn.pack;
 import org.apache.commons.lang3.StringUtils;
 import shcm.shsupercm.forge.citresewn.CITResewn;
 import shcm.shsupercm.forge.citresewn.ex.CITParseException;
-import shcm.shsupercm.fabric.citresewn.pack.cits.*;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

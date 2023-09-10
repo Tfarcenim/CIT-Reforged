@@ -41,7 +41,8 @@ public class ModelLoaderMixin {
     @Inject(method = "loadBlockModel", cancellable = true, at = @At("HEAD"))
     public void forceLiteralResewnModelIdentifier(ResourceLocation id, CallbackInfoReturnable<BlockModel> cir) {
         if (id instanceof ResewnItemModelIdentifier) {
-            cir.setReturnValue(CITHooks.forceLiteralResewnModelIdentifier((ResewnItemModelIdentifier) id));
+            BlockModel model = CITHooks.forceLiteralResewnModelIdentifier((ResewnItemModelIdentifier) id);
+            if (model != null) cir.setReturnValue(model);
         }
     }
 }

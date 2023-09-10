@@ -86,14 +86,13 @@ public class CITHooks {
 
     public static BlockModel forceLiteralResewnModelIdentifier(ResewnItemModelIdentifier identifier) {
         InputStream is = null;
-        Resource resource = null;
         try {
             ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-            BlockModel json = BlockModel.fromString(IOUtils.toString(is = (resource = resourceManager.getResource(identifier).get()).open(), StandardCharsets.UTF_8));
+            BlockModel json = BlockModel.fromString(IOUtils.toString(is = resourceManager.getResource(identifier).get().open(), StandardCharsets.UTF_8));
             json.name = identifier.toString();
             json.name = json.name.substring(0, json.name.length() - 5);
 
-            ((JsonUnbakedModelAccessor) json).getTextureMap().replaceAll((layer, original) -> {
+            json.textureMap.replaceAll((layer, original) -> {
                 Optional<Material> left = original.left();
                 if (left.isPresent()) {
                     String originalPath = left.get().texture().getPath();

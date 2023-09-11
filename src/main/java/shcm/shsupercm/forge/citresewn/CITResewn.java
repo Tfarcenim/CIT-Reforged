@@ -31,7 +31,7 @@ public class CITResewn {
         if (FMLEnvironment.dist.isClient()) {
             onInitializeClient();
         } else {
-            System.out.println("this does nothing on the server");
+            LOG.warn("this does nothing on the server");
         }
     }
     

@@ -14,16 +14,16 @@
     "defaultRequire": 1
   },
   "client": [
+    "AtlasPreparationMixin",
     "citarmor.ArmorFeatureRendererMixin",
+    "citelytra.ElytraFeatureRendererMixin",
     "citenchantment.ArmorFeatureRendererMixin",
     "citenchantment.BufferBuilderStorageAccessor",
     "citenchantment.ElytraFeatureRendererMixin",
     "citenchantment.ItemRendererMixin",
-    "AtlasPreparationMixin",
-    "citelytra.ElytraFeatureRendererMixin",
-    "cititem.JsonUnbakedModelAccessor",
-    "core.SpriteAtlasTextureMixin",
     "cititem.ItemRendererMixin",
-    "cititem.ModelLoaderMixin"
+    "cititem.JsonUnbakedModelAccessor",
+    "cititem.ModelLoaderMixin",
+    "core.SpriteAtlasTextureMixin"
   ]
 }

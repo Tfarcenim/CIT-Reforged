@@ -1,0 +1,16 @@
+{
+  "sources": [
+    {
+      "type": "citresewn:cit",
+      "root": "citresewn"
+    },
+    {
+      "type": "citresewn:cit",
+      "root": "optifine"
+    },
+    {
+      "type": "citresewn:cit",
+      "root": "mcpatcher"
+    }
+  ]
+}

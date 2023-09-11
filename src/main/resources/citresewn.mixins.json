@@ -24,7 +24,6 @@
     "cititem.JsonUnbakedModelAccessor",
     "core.SpriteAtlasTextureMixin",
     "cititem.ItemRendererMixin",
-    "cititem.ModelLoaderMixin",
-    "SpriteResourceLoaderMixin"
+    "cititem.ModelLoaderMixin"
   ]
 }

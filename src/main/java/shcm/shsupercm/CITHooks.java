@@ -9,8 +9,10 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.io.IOUtils;
 import shcm.shsupercm.forge.citresewn.ActiveCITs;
 import shcm.shsupercm.forge.citresewn.CITResewn;
@@ -23,6 +25,7 @@ import shcm.shsupercm.forge.citresewn.pack.cits.CIT;
 import shcm.shsupercm.forge.citresewn.pack.cits.CITItem;
 
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -164,4 +167,17 @@ public class CITHooks {
                 });
         CITItem.GENERATED_SUB_CITS_SEEN.clear();
     }
+
+    public static ResourceLocation getArmorTextures(ItemStack item, EquipmentSlot layer2, String overlay, WeakReference<Map<String, ResourceLocation>> armorTexturesCached) {
+        if (armorTexturesCached == null)
+            return null;
+        Map<String, ResourceLocation> armorTextures = armorTexturesCached.get();
+        if (armorTextures == null)
+            return null;
+        ArmorItem armorItem = (ArmorItem)item.getItem();
+        ResourceLocation identifier = armorTextures.get(armorItem.getMaterial().getName() + "_layer_" + (layer2== EquipmentSlot.LEGS ? "2" : "1")
+                + (overlay == null ? "" : "_" + overlay));
+        return identifier;
+    }
+
 }

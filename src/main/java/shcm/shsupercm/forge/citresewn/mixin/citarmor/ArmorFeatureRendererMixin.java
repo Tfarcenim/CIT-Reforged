@@ -1,10 +1,12 @@
 package shcm.shsupercm.forge.citresewn.mixin.citarmor;
 
+import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import shcm.shsupercm.CITHooks;
 import shcm.shsupercm.forge.citresewn.CITResewn;
 import shcm.shsupercm.forge.citresewn.config.CITResewnConfig;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -39,16 +41,9 @@ public class ArmorFeatureRendererMixin<T extends LivingEntity, M extends Humanoi
         armorTexturesCached = null;
     }
 
-    @Inject(method = "getArmorLocation", cancellable = true, at = @At("HEAD"))
-    private void getArmorTexture(ArmorItem item, boolean legs, String overlay, CallbackInfoReturnable<ResourceLocation> cir) {
-        if (armorTexturesCached == null)
-            return;
-        Map<String, ResourceLocation> armorTextures = armorTexturesCached.get();
-        if (armorTextures == null)
-            return;
-
-        ResourceLocation identifier = armorTextures.get(item.getMaterial().getName() + "_layer_" + (legs ? "2" : "1") + (overlay == null ? "" : "_" + overlay));
-        if (identifier != null)
-            cir.setReturnValue(identifier);
+    @Inject(method = "getArmorResource", cancellable = true, at = @At("HEAD"),remap = false)
+    private void getArmorTexture(Entity entity, ItemStack stack, EquipmentSlot slot, String type, CallbackInfoReturnable<ResourceLocation> cir) {
+        ResourceLocation identifier = CITHooks.getArmorTextures(stack,slot,type,armorTexturesCached);
+        if (identifier != null) cir.setReturnValue(identifier);
     }
 }

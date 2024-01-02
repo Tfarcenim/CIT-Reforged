@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "shcm.shsupercm.forge.citresewn.mixin",
   "compatibilityLevel": "JAVA_16",
+  "plugin": "shcm.shsupercm.forge.citresewn.mixin.CITReforgedMixinConfigPlugin",
   "refmap": "citresewn.refmap.json",
   "mixins": [
     "citarmor.ItemStackMixin",

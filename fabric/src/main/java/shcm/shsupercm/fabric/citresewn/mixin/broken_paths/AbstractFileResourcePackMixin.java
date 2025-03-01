@@ -10,11 +10,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import shcm.shsupercm.fabric.citresewn.config.BrokenPaths;
 
 /**
  * Adds a resourcepack compatibility error message when broken paths are enabled and are detected in a pack.
- * @see BrokenPaths
  * @see ResourcePackCompatibilityMixin
  */
 @Mixin(AbstractPackResources.class)

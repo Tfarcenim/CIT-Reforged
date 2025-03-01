@@ -9,15 +9,7 @@ import shcm.shsupercm.fabric.citresewn.mixin.broken_paths.*;
  * If not enabled, broken paths has no effect on the game.
  * @see CITResewnConfig#broken_paths
  * @see CITResewnMixinConfiguration#broken_paths
- * @see ReloadableResourceManagerImplMixin
- * @see IdentifierMixin
  * @see AbstractFileResourcePackMixin
  */
 public class BrokenPaths {
-    /**
-     * When enabled, {@link ResourceLocation}s will not check for their path's validity.
-     * @see ReloadableResourceManagerImplMixin
-     * @see IdentifierMixin
-     */
-    public static final boolean processingBrokenPaths = false;
 }

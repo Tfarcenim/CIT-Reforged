@@ -29,11 +29,6 @@ public class CITResewnConfig {
      * Invalidating interval for CITs' caches in milliseconds. Set to 0 to disable caching.
      */
     public int cache_ms = 50;
-    /**
-     * Should broken paths be allowed in resourcepacks. Requires a restart.
-     * @see BrokenPaths
-     */
-    public boolean broken_paths = false;
 
     /**
      * CIT Resewn's config storage file.

@@ -53,7 +53,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public void registerCITTypes() {
-        for (var entrypointContainer : FabricLoader.getInstance().getEntrypointContainers(CITConditionContainer.ENTRYPOINT, CITConditionContainer.class)) {
+        for (EntrypointContainer<CITConditionContainer> entrypointContainer : FabricLoader.getInstance().getEntrypointContainers(CITConditionContainer.ENTRYPOINT, CITConditionContainer.class)) {
             String namespace = entrypointContainer.getProvider().getMetadata().getId();
             if (namespace.equals("citresewn-defaults"))
                 namespace = "citresewn";

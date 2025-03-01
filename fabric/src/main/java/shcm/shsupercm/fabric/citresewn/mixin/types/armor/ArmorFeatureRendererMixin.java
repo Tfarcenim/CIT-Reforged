@@ -1,4 +1,4 @@
-package schm.shsupercm.citresewn.mixin.types.armor;
+package shcm.shsupercm.fabric.citresewn.mixin.types.armor;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

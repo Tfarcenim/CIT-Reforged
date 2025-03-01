@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
+    "types.armor.ArmorFeatureRendererMixinNeoforge"
   ],
   "server": [],
   "injectors": {

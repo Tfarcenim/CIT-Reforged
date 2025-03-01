@@ -3,6 +3,7 @@ package schm.shsupercm.citresewn.platform;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.fml.loading.FMLPaths;
 import schm.shsupercm.citresewn.CITResewn;
+import schm.shsupercm.citresewn.Shim;
 import schm.shsupercm.citresewn.pack.format.PropertyKey;
 import schm.shsupercm.citresewn.pack.format.PropertyValue;
 import schm.shsupercm.citresewn.platform.services.IPlatformHelper;
@@ -34,7 +35,7 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public void dispose() {
-
+        Shim.initDispose();
     }
 
     @Override
@@ -44,12 +45,13 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public void registerCITTypes() {
-
+        Shim.initConditions();
+        Shim.initTypes();
     }
 
     @Override
     public void callHandlers(Map<PropertyKey, Set<PropertyValue>> properties) {
-
+        Shim.initGlobalProperties(properties);
     }
 
     @Override

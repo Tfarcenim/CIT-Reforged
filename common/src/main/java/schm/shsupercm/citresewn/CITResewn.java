@@ -1,5 +1,6 @@
 package schm.shsupercm.citresewn;
 
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import schm.shsupercm.citresewn.config.CITResewnConfig;
@@ -62,5 +63,9 @@ public class CITResewn {
         if (CITResewnConfig.INSTANCE.mute_errors)
             return;
         LOG.error("{citresewn} " + message);
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID,path);
     }
 }

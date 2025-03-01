@@ -10,6 +10,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import schm.shsupercm.citresewn.cit.*;
 import schm.shsupercm.citresewn.config.CITResewnConfig;
 import schm.shsupercm.citresewn.platform.Services;
@@ -20,11 +21,12 @@ import java.util.*;
 public class CITResewnNeoforge {
 
     public CITResewnNeoforge(IEventBus eventBus) {
-        eventBus.addListener(this::commands);
+        NeoForge.EVENT_BUS.addListener(this::commands);
         // This method is invoked by the NeoForge mod loader when it is ready
         // to load your mod. You can access NeoForge and Common code in this
         // project.
 
+        CITRegistry.registerAll();
         // Use NeoForge to bootstrap the Common mod.
         CITResewn.init();
 

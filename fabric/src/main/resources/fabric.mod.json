@@ -18,8 +18,11 @@
         "main": [
         ],
         "client": [
-            "shcm.shsupercm.fabric.citresewn.CITResewnFabric"
-        ]
+            "shcm.shsupercm.fabric.citresewn.CITResewnFabric",
+        ],
+        "modmenu": [
+            "shcm.shsupercm.defaults.CITResewnDefaultsModMenu"
+        ],
     },
     "mixins": [
         "${mod_id}.mixins.json",

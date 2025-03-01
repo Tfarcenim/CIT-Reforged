@@ -19,5 +19,5 @@ public class BrokenPaths {
      * @see ReloadableResourceManagerImplMixin
      * @see IdentifierMixin
      */
-    public static boolean processingBrokenPaths = false;
+    public static final boolean processingBrokenPaths = false;
 }

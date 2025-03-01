@@ -1,6 +1,5 @@
 package shcm.shsupercm.fabric.citresewn.cit.builtin.conditions.core;
 
-import io.shcm.shsupercm.fabric.fletchingtable.api.Entrypoint;
 import shcm.shsupercm.fabric.citresewn.api.CITConditionContainer;
 import shcm.shsupercm.fabric.citresewn.cit.CIT;
 import shcm.shsupercm.fabric.citresewn.cit.builtin.conditions.IntegerCondition;
@@ -15,7 +14,7 @@ import java.util.List;
  * resourcepack and the pack's name are used as a tie breaker.
  */
 public class WeightCondition extends IntegerCondition {
-    @Entrypoint(CITConditionContainer.ENTRYPOINT)
+   // @Entrypoint(CITConditionContainer.ENTRYPOINT)
     public static final CITConditionContainer<WeightCondition> CONTAINER = new CITConditionContainer<>(WeightCondition.class, WeightCondition::new,
             "weight", "cit_weight", "citWeight");
 

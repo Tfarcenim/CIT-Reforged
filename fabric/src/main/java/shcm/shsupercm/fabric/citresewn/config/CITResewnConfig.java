@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.commons.io.IOUtils;
-import shcm.shsupercm.fabric.citresewn.CITResewn;
+import shcm.shsupercm.fabric.citresewn.CITResewnFabric;
 
 import java.io.*;
 
@@ -79,7 +79,7 @@ public class CITResewnConfig {
 
             gson.toJson(gson.toJsonTree(this, CITResewnConfig.class), writer);
         } catch (Exception e) {
-            CITResewn.LOG.error("Couldn't save config");
+            CITResewnFabric.LOG.error("Couldn't save config");
             e.printStackTrace();
             throw new RuntimeException(e);
         } finally {

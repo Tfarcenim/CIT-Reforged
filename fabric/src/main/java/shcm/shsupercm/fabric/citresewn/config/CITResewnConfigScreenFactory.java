@@ -4,6 +4,8 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import java.util.function.Function;
@@ -40,7 +42,7 @@ public class CITResewnConfigScreenFactory {
                 .setSaveConsumer(newConfig -> {
                     if (currentConfig.enabled != newConfig) {
                         currentConfig.enabled = newConfig;
-                        MinecraftClient.getInstance().reloadResources();
+                        Minecraft.getInstance().reloadResourcePacks();
                     }
                 })
                 .setDefaultValue(defaultConfig.enabled)
@@ -54,12 +56,12 @@ public class CITResewnConfigScreenFactory {
                     .setYesNoTextSupplier((b) -> {
                         if (b != currentScreen.prevToggle) {
                             //noinspection unchecked
-                            MinecraftClient.getInstance().setScreen((Screen) FabricLoader.getInstance().getEntrypoints(DEFAULTS_CONFIG_ENTRYPOINT, Function.class).stream().findAny().orElseThrow().apply(create(parent)));
+                            Minecraft.getInstance().setScreen((Screen) FabricLoader.getInstance().getEntrypoints(DEFAULTS_CONFIG_ENTRYPOINT, Function.class).stream().findAny().orElseThrow().apply(create(parent)));
 
                             currentScreen.prevToggle = b;
                         }
 
-                        return Text.translatable("config.citresewn.configure");
+                        return Component.translatable("config.citresewn.configure");
                     })
                     .build());
         }
@@ -82,16 +84,16 @@ public class CITResewnConfigScreenFactory {
                 .setDefaultValue(defaultConfig.cache_ms / 50)
                 .setTextGetter(ticks -> {
                     if (ticks <= 1)
-                        return Text.translatable("config.citresewn.cache_ms.ticks." + ticks).formatted(Formatting.AQUA);
+                        return Component.translatable("config.citresewn.cache_ms.ticks." + ticks).withStyle(ChatFormatting.AQUA);
 
-                    Formatting color = Formatting.DARK_RED;
+                    ChatFormatting color = ChatFormatting.DARK_RED;
 
-                    if (ticks <= 40) color = Formatting.RED;
-                    if (ticks <= 20) color = Formatting.GOLD;
-                    if (ticks <= 10) color = Formatting.DARK_GREEN;
-                    if (ticks <= 5) color = Formatting.GREEN;
+                    if (ticks <= 40) color = ChatFormatting.RED;
+                    if (ticks <= 20) color = ChatFormatting.GOLD;
+                    if (ticks <= 10) color = ChatFormatting.DARK_GREEN;
+                    if (ticks <= 5) color = ChatFormatting.GREEN;
 
-                    return Text.translatable("config.citresewn.cache_ms.ticks.any", ticks).formatted(color);
+                    return Component.translatable("config.citresewn.cache_ms.ticks.any", ticks).withStyle(color);
                 })
                 .build());
 

@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(FileToIdConverter.class)
 public class ResourceFinderMixin {
 
-    @Shadow @Final private String fileExtension;
+    @Shadow @Final private String extension;
 
-    @Inject(method = "toResourcePath", cancellable = true, at =
+    @Inject(method = "idToFile", cancellable = true, at =
     @At("HEAD"))
     private void citresewn$forceAbsoluteTextureIdentifier(ResourceLocation id, CallbackInfoReturnable<ResourceLocation> cir) {
-        if (id.getPath().endsWith(".png") && this.fileExtension.equals(".png"))
+        if (id.getPath().endsWith(".png") && this.extension.equals(".png"))
             cir.setReturnValue(id);
     }
 }

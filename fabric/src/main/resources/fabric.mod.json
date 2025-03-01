@@ -16,7 +16,9 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.example.examplemod.ExampleMod"
+        ],
+        "client": [
+            "shcm.shsupercm.fabric.citresewn.CITResewnFabric"
         ]
     },
     "mixins": [

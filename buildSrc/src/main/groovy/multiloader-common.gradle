@@ -49,6 +49,8 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven { url 'https://maven.terraformersmc.com/releases/' }
+
 }
 
 // Declare capabilities on the outgoing configurations.

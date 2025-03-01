@@ -2,6 +2,7 @@ package shcm.shsupercm.fabric.citresewn.mixin.broken_paths;
 
 import net.minecraft.server.packs.repository.PackCompatibility;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,6 +16,7 @@ import shcm.shsupercm.fabric.citresewn.config.BrokenPaths;
  */
 @Mixin(PackCompatibility.class)
 public abstract class ResourcePackCompatibilityMixin {
+    @Unique
     private static final PackCompatibility BROKEN_PATHS = ResourcePackCompatibility("BROKEN_PATHS", -1, "broken_paths");
 
     @SuppressWarnings("InvokerTarget")
@@ -23,13 +25,9 @@ public abstract class ResourcePackCompatibilityMixin {
         throw new AssertionError();
     }
 
-    @Inject(method = "from", cancellable = true, at = @At("HEAD"))
+    @Inject(method = "forVersion", cancellable = true, at = @At("HEAD"))
     private static void citresewn$brokenpaths$redirectBrokenPathsCompatibility
-            /*? <=1.20.1 {*/
-                /*(int current, net.minecraft.resource.ResourceType type, CallbackInfoReturnable<ResourcePackCompatibility> cir)
-            *//*?} else {*/
-                (net.minecraft.util.InclusiveRange<Integer> range, int current, CallbackInfoReturnable<PackCompatibility> cir)
-            /*?}*/ {
+            (net.minecraft.util.InclusiveRange<Integer> range, int current, CallbackInfoReturnable<PackCompatibility> cir) {
         if (current == Integer.MAX_VALUE - 53)
             cir.setReturnValue(BROKEN_PATHS);
     }

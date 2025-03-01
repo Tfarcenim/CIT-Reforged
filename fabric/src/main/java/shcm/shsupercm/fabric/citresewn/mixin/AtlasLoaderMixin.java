@@ -22,7 +22,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 public class AtlasLoaderMixin {
     @Shadow @Final private List<SpriteSource> sources;
 
-    @Inject(method = "of", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "load", at = @At("RETURN"), cancellable = true)
     private static void citresewn$atlasSource(ResourceManager resourceManager, ResourceLocation id, CallbackInfoReturnable<SpriteSourceList> cir) {
         if (id.getPath().equals("blocks") && id.getNamespace().equals("minecraft")) {
             ((AtlasLoaderMixin) (Object) cir.getReturnValue()).sources.add(new SpriteSource() {

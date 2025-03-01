@@ -23,7 +23,7 @@ public class ModelLoaderMixin {
      * @see ActiveCITs#load(ResourceManager, ProfilerFiller)
      */
     @Inject(method = "<init>", at =
-    @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/util/profiler/Profiler;push(Ljava/lang/String;)V"))
+    @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V"))
     private void citresewn$loadCITs(BlockColors blockColors, ProfilerFiller profiler, Map jsonUnbakedModels, Map blockStates, CallbackInfo ci) {
         profiler.push("citresewn:reloading_cits");
         ActiveCITs.load(Minecraft.getInstance().getResourceManager(), profiler);

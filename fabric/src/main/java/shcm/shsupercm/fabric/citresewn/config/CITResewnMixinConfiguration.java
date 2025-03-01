@@ -5,7 +5,7 @@ import net.fabricmc.loader.api.ModContainer;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
-import shcm.shsupercm.fabric.citresewn.CITResewn;
+import shcm.shsupercm.fabric.citresewn.CITResewnFabric;
 
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +53,7 @@ public class CITResewnMixinConfiguration implements IMixinConfigPlugin {
             String modid = mixinClassName.substring(0, mixinClassName.indexOf('.'));
             if (mods.contains(modid)) {
                 if (compatMods.add(modid))
-                    CITResewn.info("Loading compatibility for " + modid);
+                    CITResewnFabric.info("Loading compatibility for " + modid);
 
                 return true;
             }

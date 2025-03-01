@@ -1,6 +1,6 @@
 package shcm.shsupercm.fabric.citresewn.cit;
 
-import shcm.shsupercm.fabric.citresewn.CITResewn;
+import shcm.shsupercm.fabric.citresewn.CITResewnFabric;
 import shcm.shsupercm.fabric.citresewn.api.CITConditionContainer;
 import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
 import shcm.shsupercm.fabric.citresewn.pack.format.PropertyGroup;
@@ -53,13 +53,13 @@ public abstract class CITCondition {
     /**
      * Logs a warning with the given value's descriptor if enabled in config.
      *
-     * @see CITResewn#logWarnLoading(String)
+     * @see CITResewnFabric#logWarnLoading(String)
      * @see CITResewnConfig#mute_warns
      * @param message warning message
      * @param value value associated with the warning
      * @param properties property group associated with the warning
      */
     protected void warn(String message, PropertyValue value, PropertyGroup properties) {
-        CITResewn.logWarnLoading("Warning: " + properties.messageWithDescriptorOf(message, value.position()));
+        CITResewnFabric.logWarnLoading("Warning: " + properties.messageWithDescriptorOf(message, value.position()));
     }
 }

@@ -21,7 +21,7 @@ import shcm.shsupercm.fabric.citresewn.config.BrokenPaths;
 public abstract class AbstractFileResourcePackMixin implements PackResources {
 
     @SuppressWarnings({"unchecked"})
-    @Inject(method = "parseMetadata(Lnet/minecraft/resource/metadata/ResourceMetadataReader;)Ljava/lang/Object;", cancellable = true, at = @At("RETURN"))
+    @Inject(method = "getMetadataSection", cancellable = true, at = @At("RETURN"))
     public <T extends PackMetadataSection> void citresewn$brokenpaths$parseMetadata(MetadataSectionSerializer<T> metaReader, CallbackInfoReturnable<T> cir) {
         if (cir.getReturnValue() != null) try {
             for (String namespace : getNamespaces(PackType.CLIENT_RESOURCES)) {

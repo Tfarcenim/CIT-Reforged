@@ -1,7 +1,6 @@
 package shcm.shsupercm.fabric.citresewn.cit;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
 import net.minecraft.resources.ResourceLocation;
 import shcm.shsupercm.fabric.citresewn.api.CITConditionContainer;
 import shcm.shsupercm.fabric.citresewn.api.CITTypeContainer;
@@ -13,8 +12,8 @@ import shcm.shsupercm.fabric.citresewn.pack.format.PropertyValue;
 
 import java.util.*;
 
-import static shcm.shsupercm.fabric.citresewn.CITResewn.info;
-import static shcm.shsupercm.fabric.citresewn.CITResewn.logWarnLoading;
+import static shcm.shsupercm.fabric.citresewn.CITResewnFabric.info;
+import static shcm.shsupercm.fabric.citresewn.CITResewnFabric.logWarnLoading;
 
 /**
  * Holds a static registry runtime for all types and conditions.

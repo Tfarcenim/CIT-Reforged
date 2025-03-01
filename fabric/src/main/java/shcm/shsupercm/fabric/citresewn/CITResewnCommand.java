@@ -20,11 +20,6 @@ import shcm.shsupercm.fabric.citresewn.pack.format.PropertyValue;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
-import static net.minecraft.network.chat.Component.translationArg;
-
 /**
  * Logic for the /citresewn client command. Only enabled when Fabric API is present.<br>
  * Structure:
@@ -47,40 +42,40 @@ public class CITResewnCommand {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(
                 ClientCommandManager.literal("citresewn").executes(context -> {
-                    context.getSource().sendFeedback(nullToEmpty("CIT Resewn v" + FabricLoader.getInstance().getModContainer("citresewn").orElseThrow().getMetadata().getVersion() + ":"));
-                    context.getSource().sendFeedback(nullToEmpty("  Registered: " + CITRegistry.TYPES.values().stream().distinct().count() + " types and " + CITRegistry.CONDITIONS.values().stream().distinct().count() + " conditions"));
+                    context.getSource().sendFeedback(Component.nullToEmpty("CIT Resewn v" + FabricLoader.getInstance().getModContainer("citresewn").orElseThrow().getMetadata().getVersion() + ":"));
+                    context.getSource().sendFeedback(Component.nullToEmpty("  Registered: " + CITRegistry.TYPES.values().stream().distinct().count() + " types and " + CITRegistry.CONDITIONS.values().stream().distinct().count() + " conditions"));
 
                     final boolean active = CITResewnConfig.INSTANCE.enabled && ActiveCITs.isActive();
-                    context.getSource().sendFeedback(nullToEmpty("  Active: " + (active ? "yes" : ("no, " + (CITResewnConfig.INSTANCE.enabled ? "no cit packs loaded" : "disabled in config")))));
+                    context.getSource().sendFeedback(Component.nullToEmpty("  Active: " + (active ? "yes" : ("no, " + (CITResewnConfig.INSTANCE.enabled ? "no cit packs loaded" : "disabled in config")))));
                     if (active) {
-                        context.getSource().sendFeedback(nullToEmpty("   Loaded: " + ActiveCITs.getActive().cits.values().stream().mapToLong(Collection::size).sum() + " CITs from " + ActiveCITs.getActive().cits.values().stream().flatMap(Collection::stream).map(cit -> cit.packName).distinct().count() + " resourcepacks"));
+                        context.getSource().sendFeedback(Component.nullToEmpty("   Loaded: " + ActiveCITs.getActive().cits.values().stream().mapToLong(Collection::size).sum() + " CITs from " + ActiveCITs.getActive().cits.values().stream().flatMap(Collection::stream).map(cit -> cit.packName).distinct().count() + " resourcepacks"));
                     }
-                    context.getSource().sendFeedback(nullToEmpty(""));
+                    context.getSource().sendFeedback(Component.nullToEmpty(""));
 
                     return 1;
                 })
-                .then(literal("config")
+                .then(ClientCommandManager.literal("config")
                         .executes(context -> { //citresewn config
                             openConfig = true;
 
                             return 1;
                         }))
-                .then(literal("analyze")
-                        .then(literal("pack")
-                                .then(argument("pack", new LoadedCITPackArgument())
+                .then(ClientCommandManager.literal("analyze")
+                        .then(ClientCommandManager.literal("pack")
+                                .then(ClientCommandManager.argument("pack", new LoadedCITPackArgument())
                                         .executes(context -> { //citresewn analyze <pack>
                                             final String pack = context.getArgument("pack", String.class);
                                             if (ActiveCITs.isActive()) {
-                                                context.getSource().sendFeedback(nullToEmpty("Analyzed CIT data of \"" + pack + "\u00a7r\":"));
+                                                context.getSource().sendFeedback(Component.nullToEmpty("Analyzed CIT data of \"" + pack + "\u00a7r\":"));
 
                                                 List<Component> builder = new ArrayList<>();
 
                                                 for (Map.Entry<PropertyKey, Set<PropertyValue>> entry : ActiveCITs.getActive().globalProperties.properties.entrySet())
                                                     for (PropertyValue value : entry.getValue())
                                                         if (value.packName().equals(pack))
-                                                            builder.add(nullToEmpty("  " + entry.getKey().toString() + (value.keyMetadata() == null ? "" : "." + value.keyMetadata()) + " = " + value.value()));
+                                                            builder.add(Component.nullToEmpty("  " + entry.getKey().toString() + (value.keyMetadata() == null ? "" : "." + value.keyMetadata()) + " = " + value.value()));
                                                 if (!builder.isEmpty()) {
-                                                    context.getSource().sendFeedback(nullToEmpty(" Global Properties:"));
+                                                    context.getSource().sendFeedback(Component.nullToEmpty(" Global Properties:"));
                                                     for (Component text : builder)
                                                         context.getSource().sendFeedback(text);
 
@@ -91,10 +86,10 @@ public class CITResewnCommand {
                                                     if (!entry.getValue().isEmpty()) {
                                                         long count = entry.getValue().stream().filter(cit -> cit.packName.equals(pack)).count();
                                                         if (count > 0)
-                                                            builder.add(nullToEmpty("  " + CITRegistry.idOfType(entry.getKey()).toString() + " = " + count));
+                                                            builder.add(Component.nullToEmpty("  " + CITRegistry.idOfType(entry.getKey()).toString() + " = " + count));
                                                     }
                                                 if (!builder.isEmpty()) {
-                                                    context.getSource().sendFeedback(nullToEmpty(" Types:"));
+                                                    context.getSource().sendFeedback(Component.nullToEmpty(" Types:"));
                                                     for (Component text : builder)
                                                         context.getSource().sendFeedback(text);
 
@@ -107,9 +102,9 @@ public class CITResewnCommand {
                                                         .flatMap(cit -> Arrays.stream(cit.conditions))
                                                         .toList();
                                                 if (!conditions.isEmpty())
-                                                    context.getSource().sendFeedback(nullToEmpty(" Utilizing " + conditions.size() + " conditions(" + conditions.stream().map(Object::getClass).distinct().count() + " unique condition types)"));
+                                                    context.getSource().sendFeedback(Component.nullToEmpty(" Utilizing " + conditions.size() + " conditions(" + conditions.stream().map(Object::getClass).distinct().count() + " unique condition types)"));
                                             } else
-                                                context.getSource().sendFeedback(nullToEmpty("Not active"));
+                                                context.getSource().sendFeedback(Component.nullToEmpty("Not active"));
 
                                             return 1;
                                         })

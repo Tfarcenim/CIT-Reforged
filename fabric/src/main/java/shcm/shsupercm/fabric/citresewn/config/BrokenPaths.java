@@ -1,7 +1,8 @@
 package shcm.shsupercm.fabric.citresewn.config;
 
 import net.minecraft.resources.ResourceLocation;
-import shcm.shsupercm.fabric.citresewn.mixin.broken_paths.*;
+import schm.shsupercm.citresewn.config.CITResewnConfig;
+import schm.shsupercm.citresewn.mixin.AbstractFileResourcePackMixin;
 
 /**
  * Broken paths are resourcepack file paths that do not follow {@link ResourceLocation}'s specifications.<br>

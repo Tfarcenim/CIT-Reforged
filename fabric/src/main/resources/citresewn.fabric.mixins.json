@@ -3,17 +3,9 @@
   "minVersion": "0.8",
   "package": "shcm.shsupercm.fabric.citresewn.mixin",
   "refmap": "${mod_id}.refmap.json",
-  "plugin": "shcm.shsupercm.fabric.citresewn.config.CITResewnMixinConfiguration",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "broken_paths.AbstractFileResourcePackMixin",
-    "AtlasPreparationMixin",
-    "AtlasLoaderMixin",
-    "broken_paths.ResourcePackCompatibilityMixin",
-    "ModelLoaderMixin",
-    "ResourceFinderMixin",
-    "ChatScreenMixin"
   ],
   "server": [],
   "injectors": {

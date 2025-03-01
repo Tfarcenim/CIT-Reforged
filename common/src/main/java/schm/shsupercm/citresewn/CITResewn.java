@@ -2,6 +2,7 @@ package schm.shsupercm.citresewn;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import schm.shsupercm.citresewn.config.CITResewnConfig;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -26,5 +27,35 @@ public class CITResewn {
         // we have an interface in the common code and use a loader specific implementation to delegate our call to
         // the platform specific approach.
 
+    }
+
+    /**
+     * Logs an info line in CIT Resewn's name.
+     * @param message log message
+     */
+    public static void info(String message) {
+        LOG.info("[citresewn] " + message);
+    }
+
+    /**
+     * Logs a warning line in CIT Resewn's name if enabled in config.
+     * @see CITResewnConfig#mute_warns
+     * @param message warn message
+     */
+    public static void logWarnLoading(String message) {
+        if (CITResewnConfig.INSTANCE.mute_warns)
+            return;
+        LOG.error("[citresewn] " + message);
+    }
+
+    /**
+     * Logs an error line in CIT Resewn's name if enabled in config.
+     * @see CITResewnConfig#mute_errors
+     * @param message error message
+     */
+    public static void logErrorLoading(String message) {
+        if (CITResewnConfig.INSTANCE.mute_errors)
+            return;
+        LOG.error("{citresewn} " + message);
     }
 }

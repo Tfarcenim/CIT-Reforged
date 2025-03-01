@@ -1,5 +1,12 @@
 package schm.shsupercm.citresewn.platform.services;
 
+import schm.shsupercm.citresewn.pack.format.PropertyKey;
+import schm.shsupercm.citresewn.pack.format.PropertyValue;
+
+import java.io.File;
+import java.util.Map;
+import java.util.Set;
+
 public interface IPlatformHelper {
 
     /**
@@ -33,4 +40,12 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    void dispose();
+
+    File getConfigDir();
+
+    void registerCITTypes();
+
+    void callHandlers(Map<PropertyKey, Set<PropertyValue>> properties);
 }

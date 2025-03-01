@@ -12,10 +12,11 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
-import shcm.shsupercm.fabric.citresewn.cit.*;
-import shcm.shsupercm.fabric.citresewn.config.CITResewnConfig;
-import shcm.shsupercm.fabric.citresewn.pack.format.PropertyKey;
-import shcm.shsupercm.fabric.citresewn.pack.format.PropertyValue;
+import schm.shsupercm.citresewn.cit.*;
+import schm.shsupercm.citresewn.mixin.ChatScreenMixin;
+import schm.shsupercm.citresewn.config.CITResewnConfig;
+import schm.shsupercm.citresewn.pack.format.PropertyKey;
+import schm.shsupercm.citresewn.pack.format.PropertyValue;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +32,7 @@ import java.util.stream.Collectors;
  */
 public class CITResewnCommand {
     /**
-     * @see shcm.shsupercm.fabric.citresewn.mixin.ChatScreenMixin
+     * @see ChatScreenMixin
      */
     public static boolean openConfig = false;
 
@@ -116,7 +117,7 @@ public class CITResewnCommand {
     }
 
     /**
-     * Greedy string argument that is limited to cit pack names loaded in {@link shcm.shsupercm.fabric.citresewn.cit.ActiveCITs}.
+     * Greedy string argument that is limited to cit pack names loaded in {@link ActiveCITs}.
      */
     private static class LoadedCITPackArgument implements ArgumentType<String> {
         @Override

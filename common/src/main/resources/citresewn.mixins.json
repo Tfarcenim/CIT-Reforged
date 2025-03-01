@@ -21,7 +21,6 @@
     "common.ModelLoaderMixin",
     "types.enchantment.ElytraFeatureRendererMixin",
     "types.item.ModelLoaderMixin",
-    "types.enchantment.RenderPhaseAccessor",
     "types.enchantment.ArmorFeatureRendererMixin",
     "types.enchantment.ItemRendererMixin",
     "types.item.JsonUnbakedModelAccessor"

@@ -1,0 +1,28 @@
+package shcm.shsupercm.defaults;
+
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.AlertScreen;
+import net.minecraft.network.chat.Component;
+import shcm.shsupercm.CITResewnDefaultsConfigScreenFactory;
+
+//@Entrypoint("modmenu")
+public class CITResewnDefaultsModMenu implements ModMenuApi {
+    @Override
+    public ConfigScreenFactory<?> getModConfigScreenFactory() {
+        if (FabricLoader.getInstance().isModLoaded("cloth-config2"))
+            return new ClothConfigOpenImpl().getModConfigScreenFactory();
+
+        return parent -> new AlertScreen(() -> Minecraft.getInstance().setScreen(parent), Component.literal("CIT Resewn: Defaults"),
+                Component.literal("CIT Resewn requires Cloth Config to be able to show the config."));
+    }
+
+    private static class ClothConfigOpenImpl implements ModMenuApi {
+        @Override
+        public ConfigScreenFactory<?> getModConfigScreenFactory() {
+            return CITResewnDefaultsConfigScreenFactory::create;
+        }
+    }
+}

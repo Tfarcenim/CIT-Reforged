@@ -1,5 +1,6 @@
 package schm.shsupercm.citresewn.platform.services;
 
+import net.minecraft.client.gui.screens.Screen;
 import schm.shsupercm.citresewn.pack.format.PropertyKey;
 import schm.shsupercm.citresewn.pack.format.PropertyValue;
 
@@ -48,4 +49,8 @@ public interface IPlatformHelper {
     void registerCITTypes();
 
     void callHandlers(Map<PropertyKey, Set<PropertyValue>> properties);
+
+    Screen create(Screen parent);
+
+    String getModVersion();
 }

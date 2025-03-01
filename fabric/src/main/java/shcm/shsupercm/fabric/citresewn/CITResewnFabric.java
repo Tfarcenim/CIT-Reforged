@@ -15,8 +15,7 @@ public class CITResewnFabric implements ClientModInitializer {
     public void onInitializeClient() {
         CITRegistry.registerAll();
 
-        CITResewnCommand.register();
+        CITResewnCommandFabric.register();
         CITResewn.init();
     }
-
 }

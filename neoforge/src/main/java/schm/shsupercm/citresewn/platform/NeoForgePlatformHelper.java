@@ -1,14 +1,22 @@
 package schm.shsupercm.citresewn.platform;
 
+import net.minecraft.client.gui.screens.Screen;
+import net.neoforged.fml.loading.FMLPaths;
+import schm.shsupercm.citresewn.CITResewn;
+import schm.shsupercm.citresewn.pack.format.PropertyKey;
+import schm.shsupercm.citresewn.pack.format.PropertyValue;
 import schm.shsupercm.citresewn.platform.services.IPlatformHelper;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLLoader;
+
+import java.io.File;
+import java.util.Map;
+import java.util.Set;
 
 public class NeoForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public String getPlatformName() {
-
         return "NeoForge";
     }
 
@@ -22,5 +30,35 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     public boolean isDevelopmentEnvironment() {
 
         return !FMLLoader.isProduction();
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+
+    @Override
+    public File getConfigDir() {
+        return FMLPaths.CONFIGDIR.get().toFile();
+    }
+
+    @Override
+    public void registerCITTypes() {
+
+    }
+
+    @Override
+    public void callHandlers(Map<PropertyKey, Set<PropertyValue>> properties) {
+
+    }
+
+    @Override
+    public Screen create(Screen parent) {
+        return null;
+    }
+
+    @Override
+    public String getModVersion() {
+        return ModList.get().getModFileById(CITResewn.MOD_ID).versionString();
     }
 }

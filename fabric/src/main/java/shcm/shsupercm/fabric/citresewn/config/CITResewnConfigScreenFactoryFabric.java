@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import schm.shsupercm.citresewn.config.CITResewnConfig;
+import schm.shsupercm.citresewn.platform.Services;
 
 import java.util.function.Function;
 
@@ -16,7 +17,7 @@ import java.util.function.Function;
  * Cloth Config integration to CIT Resewn's config
  * @see CITResewnConfig
  */
-public class CITResewnConfigScreenFactory {
+public class CITResewnConfigScreenFactoryFabric {
     /**
      * Used to get CIT Resewn - Defaults's Cloth Config implementation.
      */
@@ -50,7 +51,7 @@ public class CITResewnConfigScreenFactory {
                 .setDefaultValue(defaultConfig.enabled)
                 .build());
 
-        if (FabricLoader.getInstance().isModLoaded("citresewn-defaults")) {
+        if (Services.PLATFORM.isModLoaded("citresewn-defaults")) {
             class CurrentScreen { boolean prevToggle = false; } final CurrentScreen currentScreen = new CurrentScreen();
             category.addEntry(entryBuilder.startBooleanToggle(Component.translatable("config.citresewn-defaults.title"), false)
                     .setTooltip(Component.translatable("config.citresewn-defaults.tooltip"))

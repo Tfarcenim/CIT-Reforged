@@ -1,6 +1,7 @@
 package shcm.shsupercm.fabric.citresewn.platform;
 
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import schm.shsupercm.citresewn.CITResewn;
 import schm.shsupercm.citresewn.api.CITConditionContainer;
@@ -12,6 +13,7 @@ import schm.shsupercm.citresewn.pack.format.PropertyKey;
 import schm.shsupercm.citresewn.pack.format.PropertyValue;
 import schm.shsupercm.citresewn.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import shcm.shsupercm.fabric.citresewn.config.CITResewnConfigScreenFactoryFabric;
 
 import java.io.File;
 import java.util.Map;
@@ -99,5 +101,15 @@ public class FabricPlatformHelper implements IPlatformHelper {
                     }
                 }
         }
+    }
+
+    @Override
+    public Screen create(Screen parent) {
+        return CITResewnConfigScreenFactoryFabric.create(parent);
+    }
+
+    @Override
+    public String getModVersion() {
+        return FabricLoader.getInstance().getModContainer(CITResewn.MOD_ID).orElseThrow().getMetadata().getVersion().toString();
     }
 }

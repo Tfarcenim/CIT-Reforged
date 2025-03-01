@@ -1,26 +1,18 @@
 package shcm.shsupercm.fabric.citresewn;
 
-import com.mojang.brigadier.LiteralMessage;
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
+import schm.shsupercm.citresewn.CITResewn;
+import schm.shsupercm.citresewn.CITResewnCommandCommon;
 import schm.shsupercm.citresewn.cit.*;
-import schm.shsupercm.citresewn.mixin.ChatScreenMixin;
 import schm.shsupercm.citresewn.config.CITResewnConfig;
 import schm.shsupercm.citresewn.pack.format.PropertyKey;
 import schm.shsupercm.citresewn.pack.format.PropertyValue;
+import schm.shsupercm.citresewn.platform.Services;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
+
 /**
  * Logic for the /citresewn client command. Only enabled when Fabric API is present.<br>
  * Structure:
@@ -30,11 +22,7 @@ import java.util.stream.Collectors;
  * /citresewn analyze pack &lt;pack&gt; - Displays data for the given loaded cit pack.
  * </pre>
  */
-public class CITResewnCommand {
-    /**
-     * @see ChatScreenMixin
-     */
-    public static boolean openConfig = false;
+public class CITResewnCommandFabric {
 
     /**
      * Registers all of CIT Resewn's commands.
@@ -42,8 +30,8 @@ public class CITResewnCommand {
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(
-                ClientCommandManager.literal("citresewn").executes(context -> {
-                    context.getSource().sendFeedback(Component.nullToEmpty("CIT Resewn v" + FabricLoader.getInstance().getModContainer("citresewn").orElseThrow().getMetadata().getVersion() + ":"));
+                ClientCommandManager.literal(CITResewn.MOD_ID).executes(context -> {
+                    context.getSource().sendFeedback(Component.nullToEmpty("CIT Resewn v" + Services.PLATFORM.getModVersion() + ":"));
                     context.getSource().sendFeedback(Component.nullToEmpty("  Registered: " + CITRegistry.TYPES.values().stream().distinct().count() + " types and " + CITRegistry.CONDITIONS.values().stream().distinct().count() + " conditions"));
 
                     final boolean active = CITResewnConfig.INSTANCE.enabled && ActiveCITs.isActive();
@@ -57,13 +45,13 @@ public class CITResewnCommand {
                 })
                 .then(ClientCommandManager.literal("config")
                         .executes(context -> { //citresewn config
-                            openConfig = true;
+                            CITResewn.openConfig = true;
 
                             return 1;
                         }))
                 .then(ClientCommandManager.literal("analyze")
                         .then(ClientCommandManager.literal("pack")
-                                .then(ClientCommandManager.argument("pack", new LoadedCITPackArgument())
+                                .then(ClientCommandManager.argument("pack", new CITResewnCommandCommon.LoadedCITPackArgument())
                                         .executes(context -> { //citresewn analyze <pack>
                                             final String pack = context.getArgument("pack", String.class);
                                             if (ActiveCITs.isActive()) {
@@ -116,44 +104,4 @@ public class CITResewnCommand {
         });
     }
 
-    /**
-     * Greedy string argument that is limited to cit pack names loaded in {@link ActiveCITs}.
-     */
-    private static class LoadedCITPackArgument implements ArgumentType<String> {
-        @Override
-        public String parse(StringReader reader) throws CommandSyntaxException {
-            StringBuilder builder = new StringBuilder();
-            while (reader.canRead())
-                builder.append(reader.read());
-
-            String pack = builder.toString().trim();
-
-            if (!getPacks().contains(pack)) {
-                LiteralMessage message = new LiteralMessage("Could not find CIT pack");
-                throw new CommandSyntaxException(new SimpleCommandExceptionType(message), message);
-            }
-
-            return pack;
-        }
-
-        @Override
-        public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-            return CompletableFuture.supplyAsync(() -> {
-                for (String pack : getPacks()) {
-                    builder.suggest(pack);
-                }
-                return builder.build();
-            });
-        }
-
-        private static Set<String> getPacks() {
-            if (ActiveCITs.isActive())
-                return ActiveCITs.getActive().cits.values().stream()
-                        .flatMap(Collection::stream)
-                        .map(cit -> cit.packName)
-                        .collect(Collectors.toSet());
-            else
-                return Collections.emptySet();
-        }
-    }
 }

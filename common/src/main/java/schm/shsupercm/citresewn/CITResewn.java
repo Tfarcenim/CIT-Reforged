@@ -3,6 +3,7 @@ package schm.shsupercm.citresewn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import schm.shsupercm.citresewn.config.CITResewnConfig;
+import schm.shsupercm.citresewn.mixin.ChatScreenMixin;
 
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
@@ -13,6 +14,10 @@ public class CITResewn {
     public static final String MOD_ID = "citresewn";
     public static final String MOD_NAME = "CITResewn";
     public static final Logger LOG = LoggerFactory.getLogger(MOD_NAME);
+    /**
+     * @see ChatScreenMixin
+     */
+    public static boolean openConfig = false;
 
     // The loader specific projects are able to import and use any code from the common project. This allows you to
     // write the majority of your code here and load it from your loader specific projects. This example has some

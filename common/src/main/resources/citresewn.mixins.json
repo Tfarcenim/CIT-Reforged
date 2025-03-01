@@ -4,9 +4,14 @@
   "package": "schm.shsupercm.citresewn.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [],
+  "mixins": [
+    "AbstractFileResourcePackMixin",
+    "ResourceFinderMixin",
+    "ResourcePackCompatibilityMixin"
+  ],
   "client": [
     "AtlasLoaderMixin",
+    "AtlasPreparationMixin",
     "ChatScreenMixin",
     "ModelLoaderMixin",
     "common.ModelLoaderMixin",

@@ -1,0 +1,26 @@
+accessWidener	v1	named
+accessible	field	net/minecraft/nbt/CompoundTag	tags	Ljava/util/Map;
+accessible	class	net/minecraft/client/renderer/block/model/ItemOverrides$BakedOverride
+accessible	class	net/minecraft/client/renderer/block/model/ItemOverrides$PropertyMatcher
+accessible	method	net/minecraft/client/renderer/block/model/ItemOverrides	<init>	()V
+accessible	method	net/minecraft/client/renderer/block/model/ItemOverrides$BakedOverride	<init>	([Lnet/minecraft/client/renderer/block/model/ItemOverrides$PropertyMatcher;Lnet/minecraft/client/resources/model/BakedModel;)V
+accessible	method	net/minecraft/client/renderer/block/model/ItemOverrides$PropertyMatcher	<init>	(IF)V
+accessible	field	net/minecraft/client/renderer/block/model/ItemOverrides	overrides	[Lnet/minecraft/client/renderer/block/model/ItemOverrides$BakedOverride;
+mutable	field	net/minecraft/client/renderer/block/model/ItemOverrides	overrides	[Lnet/minecraft/client/renderer/block/model/ItemOverrides$BakedOverride;
+accessible	field	net/minecraft/client/renderer/block/model/ItemOverrides	properties	[Lnet/minecraft/resources/ResourceLocation;
+mutable	field	net/minecraft/client/renderer/block/model/ItemOverrides	properties	[Lnet/minecraft/resources/ResourceLocation;
+accessible	field	net/minecraft/client/renderer/MultiBufferSource$BufferSource	layerBuffers	Ljava/util/Map;
+accessible	field	net/minecraft/client/renderer/MultiBufferSource$BufferSource	fixedBuffers	Ljava/util/SequencedMap;
+accessible	class	net/minecraft/client/renderer/RenderType$CompositeState
+accessible	method	net/minecraft/client/renderer/RenderType	create	(Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;ILnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
+accessible	class	net/minecraft/client/renderer/RenderStateShard$ShaderStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$TexturingStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$TransparencyStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$TextureStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$LightmapStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$OverlayStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$CullStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$DepthTestStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$WriteMaskStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$LayeringStateShard
+accessible	class	net/minecraft/client/renderer/RenderStateShard$OutputStateShard

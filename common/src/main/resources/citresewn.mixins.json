@@ -7,7 +7,24 @@
   "mixins": [],
   "client": [
     "AtlasLoaderMixin",
-    "ChatScreenMixin"
+    "ChatScreenMixin",
+
+    "types.item.ItemStackMixin",
+    "types.item.BakedModelManagerMixin",
+    "types.elytra.ElytraFeatureRendererMixin",
+    "types.enchantment.ItemStackMixin",
+    "types.armor.ItemStackMixin",
+    "types.armor.ArmorFeatureRendererMixin",
+    "types.elytra.ItemStackMixin",
+    "types.enchantment.MinecraftClientMixin",
+    "types.item.ItemRendererMixin",
+    "common.ModelLoaderMixin",
+    "types.enchantment.ElytraFeatureRendererMixin",
+    "types.item.ModelLoaderMixin",
+    "types.enchantment.RenderPhaseAccessor",
+    "types.enchantment.ArmorFeatureRendererMixin",
+    "types.enchantment.ItemRendererMixin",
+    "types.item.JsonUnbakedModelAccessor"
   ],
   "server": [],
   "injectors": {

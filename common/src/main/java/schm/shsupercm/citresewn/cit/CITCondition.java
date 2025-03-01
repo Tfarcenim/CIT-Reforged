@@ -53,8 +53,8 @@ public abstract class CITCondition {
     /**
      * Logs a warning with the given value's descriptor if enabled in config.
      *
-     * @see CITResewnFabric#logWarnLoading(String)
-     * @see CITResewnConfig#mute_warns
+     * @see CITResewn#logWarnLoading(String)
+     * @see schm.shsupercm.citresewn.config.CITResewnConfig#mute_warns
      * @param message warning message
      * @param value value associated with the warning
      * @param properties property group associated with the warning
